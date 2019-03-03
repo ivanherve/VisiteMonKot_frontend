@@ -32,7 +32,7 @@ class Login extends Component {
                       </Form.Group>
                       <Row>
                         <Col xs={6}>
-                          <Button variant="primary" type="submit">Se Connecter</Button>
+                          <Button variant="primary"><Link style={{color: '#fff'}} to="/accomodations">Se Connecter</Link></Button>
                         </Col>
                         <Col xs={6} className="text-right">
                           <Button variant="outline-primary">Mot de passe oublié ?</Button>

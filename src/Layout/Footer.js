@@ -7,7 +7,7 @@ class Footer extends Component {
         return (
             <div>
                 <Navbar collapseOnSelect expand="lg" bg="success" variant="dark" fixed='bottom'>
-                    <div>visitemonkot.be</div>
+                    <div style={{color: '#fff'}}>visitemonkot.be © 2019</div>
                 </Navbar>
             </div>
         );
