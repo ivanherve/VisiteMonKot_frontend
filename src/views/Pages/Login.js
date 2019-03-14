@@ -2,10 +2,61 @@ import React, { Component } from 'react';
 //import '../../App.css';
 import backgroundImg from '../../logo/Accommodation-background.jpg';
 import { Container, Card, Row, Col, Form, FormGroup, Button, CardGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
+import { apiUrl, domain } from '../../router';
 
 class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      redirect: false,
+    }
+    this.signIn = this.signIn.bind(this);
+    this.handleEmail = this.handleEmail.bind(this);
+    this.handlePassword = this.handlePassword.bind(this);
+  }
+
+  handleEmail(e) {
+    this.setState({ email: e.target.value });
+  }
+
+  handlePassword(p) {
+    this.setState({ password: p.target.value })
+  }
+
+  signIn = () => {
+    fetch(apiUrl + 'signin', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: this.state.email,
+        password: this.state.password
+      })
+    })
+      .then(response => response.json())
+      .then(res => {
+        if (res.status == 'success') {
+          sessionStorage.setItem('userData', JSON.stringify(res.response));
+          this.setState({ redirect: true });
+        }
+        else {
+          alert(res.response);
+          console.log(res.response)
+        }
+      })
+  }
+
   render() {
+    if (this.state.redirect) {
+      return (<Redirect to="/" />)
+    }
+    if (sessionStorage.getItem('userData')) {
+      return (<Redirect to="/" />)
+    }
     return (
       <div style={styles.content}>
         <Container>
@@ -21,18 +72,20 @@ class Login extends Component {
                       <p className="text-muted">Connectez-vous à votre compte</p>
                       <FormGroup>
                         <Form.Label>Adresse e-mail</Form.Label>
-                        <Form.Control type="email" placeholder="adresse@email.be" />
+                        <Form.Control type="email" placeholder="adresse@email.be" onChange={this.handleEmail} />
                         <Form.Text className="text-muted">
                           Cette adresse e-mail ne sera en aucun cas partagé à qui que ce soit.
                       </Form.Text>
                       </FormGroup>
                       <Form.Group controlId="formBasicPassword">
                         <Form.Label>Mot de passe</Form.Label>
-                        <Form.Control type="password" placeholder="Mot de passe" />
+                        <Form.Control type="password" placeholder="Mot de passe" onChange={this.handlePassword} />
                       </Form.Group>
                       <Row>
                         <Col xs={6}>
-                          <Button variant="primary"><Link style={{color: '#fff'}} to="/accomodations">Se Connecter</Link></Button>
+                          <Button variant="primary" onClick={() => this.signIn()}>
+                            Se connecter
+                          </Button>
                         </Col>
                         <Col xs={6} className="text-right">
                           <Button variant="outline-primary">Mot de passe oublié ?</Button>

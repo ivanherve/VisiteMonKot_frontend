@@ -12,15 +12,34 @@ import VisitsList from '../views/Containers/visitsList';
 
 
 class Layout extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      redirect: false,
+    }
+  }
+
+  componentWillMount(){
+    if(sessionStorage.getItem('userData')){
+      console.log('call user feed')
+    } else {
+      this.setState({redirect: true})
+    }
+  }
+
   render() {
+    if(this.state.redirect){
+      return (<Redirect to='/login' /> )
+    }
     return (
       <div>
-        <Headers />
+        <Headers onClick={() => this.setState({redirect: true})} />
         <div style={{ marginTop: '70px' }}>
           <Switch>
             <Route path='/annonces' component={MyAdvertisments} />
             <Route path='/accomodations' component={AccomodationsList} />
             <Route path='/visites' component={VisitsList} />
+            <Redirect from="/" to="/accomodations" />
           </Switch>
         </div>
         <Footer />
