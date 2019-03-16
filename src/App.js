@@ -8,8 +8,6 @@ import Login from './views/Pages/Login';
 import Page404 from './views/Pages/Page404';
 import Page500 from './views/Pages/Page500';
 
-
-
 library.add(
   faSignOutAlt,
   faCog,
