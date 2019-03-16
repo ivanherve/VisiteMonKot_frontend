@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
+import { Button, Card, CardGroup, Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
+import { Link, Redirect } from 'react-router-dom';
 //import '../../App.css';
 import backgroundImg from '../../logo/Accommodation-background.jpg';
-import { Container, Card, Row, Col, Form, FormGroup, Button, CardGroup } from 'react-bootstrap';
-import { Link, Redirect } from 'react-router-dom';
-import { apiUrl, domain } from '../../router';
+import { apiUrl } from '../../router';
 
 class Login extends Component {
   constructor(props) {
@@ -72,18 +72,18 @@ class Login extends Component {
                       <p className="text-muted">Connectez-vous à votre compte</p>
                       <FormGroup>
                         <Form.Label>Adresse e-mail</Form.Label>
-                        <Form.Control type="email" placeholder="adresse@email.be" onChange={this.handleEmail} />
+                        <Form.Control type="email" name="email" placeholder="adresse@email.be" onChange={this.handleEmail} />
                         <Form.Text className="text-muted">
                           Cette adresse e-mail ne sera en aucun cas partagé à qui que ce soit.
                       </Form.Text>
                       </FormGroup>
                       <Form.Group controlId="formBasicPassword">
                         <Form.Label>Mot de passe</Form.Label>
-                        <Form.Control type="password" placeholder="Mot de passe" onChange={this.handlePassword} />
+                        <Form.Control type="password" name="password" placeholder="Mot de passe" onChange={this.handlePassword} />
                       </Form.Group>
                       <Row>
                         <Col xs={6}>
-                          <Button variant="primary" onClick={() => this.signIn()}>
+                          <Button variant="primary" onClick={this.signIn}>
                             Se connecter
                           </Button>
                         </Col>
