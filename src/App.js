@@ -22,14 +22,7 @@ class App extends Component {
           <Route exact path="/login" name="Login Page" component={Login} />
           <Route path="/404" name="Page 404" component={Page404} />
           <Route path="/500" name="Page 500" component={Page500} />
-          {
-            sessionStorage.getItem('userData')
-              ?
-              <Route path="/" name="Home" component={Layout} />
-              :
-              <Redirect from="/" to="/login" />
-          }
-
+          <Route path="/" name="Home" component={Layout} />
         </Switch>
       </Router>
     );

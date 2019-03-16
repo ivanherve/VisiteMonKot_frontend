@@ -9,35 +9,41 @@ import Headers from './Header';
 
 
 class Layout extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       redirect: false,
     }
   }
 
-  componentWillMount(){
-    if(sessionStorage.getItem('userData')){
+  componentWillMount() {
+    if (sessionStorage.getItem('userData')) {
       console.log('call user feed')
     } else {
-      this.setState({redirect: true})
+      this.setState({ redirect: true })
     }
   }
 
   render() {
-    if(this.state.redirect){
-      return (<Redirect to='/login' /> )
-    }
     return (
       <div>
-        <Headers onClick={() => this.setState({redirect: true})} />
+        <Headers onClick={() => this.setState({ redirect: true })} />
         <div style={{ marginTop: '70px' }}>
-          <Switch>
-            <Route path='/annonces' component={MyAdvertisments} />
-            <Route path='/accomodations' component={AccomodationsList} />
-            <Route path='/visites' component={VisitsList} />
-            <Redirect from="/" to="/accomodations" />
-          </Switch>
+          {
+            sessionStorage.getItem('userData')
+              ?
+              <Switch>
+                <Route path='/accomodations' component={AccomodationsList} />
+                <Route path='/annonces' component={MyAdvertisments} />
+                <Route path='/visites' component={VisitsList} />
+                <Redirect from="/" to="/accomodations" />
+              </Switch>
+              :
+              <Switch>
+                <Route path='/accomodations' component={AccomodationsList} />
+                <Redirect from="/" to="/accomodations" />
+              </Switch>
+          }
         </div>
         <Footer />
       </div>
