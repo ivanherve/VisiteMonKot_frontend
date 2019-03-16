@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { Nav, Navbar, NavDropdown, Button } from 'react-bootstrap';
-import { Link, Redirect } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { Component } from 'react';
+import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Link, Redirect } from 'react-router-dom';
 import '../App.css';
 import logo from '../logo/vmk_v5_1.svg';
 import { apiUrl } from '../router';
@@ -65,7 +65,9 @@ class Header extends Component {
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item>Separated link</NavDropdown.Item>
                             </NavDropdown>
-                            <Nav.Link style={styles.links}><FontAwesomeIcon icon={["fas", "user"]} style={styles.links} /></Nav.Link>
+                            <Nav.Link style={styles.links}>
+                                <FontAwesomeIcon icon={["fas", "user"]} style={styles.links} />
+                            </Nav.Link>
                             <Nav.Link eventKey={2}>
                                 <Button style={styles.links} onClick={() => this.signOut()}><FontAwesomeIcon icon={["fas", "sign-out-alt"]} /></Button>
                             </Nav.Link>
