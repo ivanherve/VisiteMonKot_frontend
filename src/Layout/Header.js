@@ -63,19 +63,25 @@ class Header extends Component {
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                         <Navbar.Collapse id="responsive-navbar-nav">
                             <Nav className="mr-auto">
-                                <Nav.Item><Nav.Link><Link style={styles.links} to="/annonces">Mes annonces</Link></Nav.Link></Nav.Item>
-                                <Nav.Item><Nav.Link><Link style={styles.links} to="/visites">Mes visites</Link></Nav.Link></Nav.Item>
+                                <Nav.Item>
+                                    <Link className="nav-link" to="/annonces">Mes annonces</Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Link className="nav-link" to="/visites">Mes visiteurs</Link>
+                                </Nav.Item>
                             </Nav>
                             <Nav>
-                                <NavDropdown title={<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />}>
-                                    <NavDropdown.Item>Modifier mes informations</NavDropdown.Item>
-                                    <NavDropdown.Item>Modifier mon mot de passe</NavDropdown.Item>
-                                    <NavDropdown.Divider />
-                                    <NavDropdown.Item>Separated link</NavDropdown.Item>
-                                </NavDropdown>
-                                <Nav.Link style={styles.links}>
-                                    <FontAwesomeIcon icon={["fas", "user"]} style={styles.links} />
+                                <Nav.Link>
+                                    <Link className="nav-link" to="/profile"><FontAwesomeIcon icon={["fas", "user"]} /> {user.Firstname} {user.Surname}</Link>
                                 </Nav.Link>
+                                <NavDropdown title="Paramètres" className="nav-link"
+                                    //<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />+
+                                    // {Paramètres}
+                                     >
+                                    <NavDropdown.Item><Link to="/resetpwd">Modifier mon mot de passe</Link></NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item><Link to="/contact">Contacter l'équipe VisiteMonKot</Link></NavDropdown.Item>
+                                </NavDropdown>
                                 <Nav.Link eventKey={2}>
                                     <Button style={styles.links} onClick={() => this.signOut()}><FontAwesomeIcon icon={["fas", "sign-out-alt"]} /> Déconnexion</Button>
                                 </Nav.Link>
