@@ -4,6 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 //import '../../App.css';
 import backgroundImg from '../../logo/Accommodation-background.jpg';
 import { apiUrl } from '../../router';
+import SignUp from './SignUp';
 
 class Login extends Component {
   constructor(props) {
@@ -88,22 +89,17 @@ class Login extends Component {
                           </Button>
                         </Col>
                         <Col xs={6} className="text-right">
-                          <Button variant="outline-primary">Mot de passe oublié ?</Button>
+                          <Button variant="outline-primary">Mdp oublié ?</Button>
                         </Col>
                       </Row>
                     </Form>
                   </Card.Body>
                 </Card>
-                <Card bg="success" style={{ width: '44%', color: 'white' }}>
-                  <Card.Body className="text-center">
-                    <div>
-                      <h2>Inscription</h2>
-                      <p>Cherchez, Annoncez et organisez des visites de la plus simple des façons</p>
-                      <Link to="/register">
-                        <Button color="primary" className="mt-3" active tabIndex={-1}>Inscrivez-vous maintenant!</Button>
-                      </Link>
-                    </div>
-                  </Card.Body>
+                <Card bg="success" style={{ color: 'white' }}>
+                  <Card.Header className="text-center">
+                  <Card.Title><h1>Inscription</h1></Card.Title>
+                  </Card.Header>
+                    <SignUp redirection={() => this.setState({ redirect: true })} />
                 </Card>
               </CardGroup>
             </Col>
