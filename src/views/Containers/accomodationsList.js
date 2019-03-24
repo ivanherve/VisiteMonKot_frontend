@@ -89,7 +89,7 @@ const AccomodationItem = ({ accomo, key, variant }) => {
         </Col>
         <Col md={{ offset: 1 }}>
           <Row>
-            <Col>
+            <Col xs={10}>
               <h3>{accomo.Title}</h3>
               <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
               <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
@@ -99,7 +99,7 @@ const AccomodationItem = ({ accomo, key, variant }) => {
             {
               sessionStorage.getItem('userData')
                 ?
-                <Col>
+                <Col xs={2}>
                   <Button variant={variant} disabled={variant === 'danger'}>Visiter ?</Button>
                 </Col>
                 :
