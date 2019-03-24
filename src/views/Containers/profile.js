@@ -11,12 +11,14 @@ export default class Profile extends Component {
         return (
             <Container>
                 <div>
-                    <Row style={{ marginTop: '100px' }}>
+                    <Row style={{ marginTop: '80px' }}>
                         <Col xs={3}>
                             <Card>
                                 <Card.Img variant="top" src={ProfilePic} />
                                 <Card.Body>
-                                    <Card.Title style={{ display: 'flex', justifyContent: 'center' }}>{user.Firstname} {user.Surname}</Card.Title>
+                                    <Card.Title style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {user.Firstname} {user.Surname}
+                                    </Card.Title>
                                     <Card.Text style={{ display: 'flex', justifyContent: 'center' }}>
                                         Some quick example text to build on the card title and make up the bulk of
                                         the card's content.
@@ -29,7 +31,7 @@ export default class Profile extends Component {
                                     <ListGroupItem>
                                         Modifier mon mot de passe
                                     </ListGroupItem>
-                                    <ListGroupItem>
+                                    <ListGroupItem variant="danger">
                                         Supprimer mon compte
                                     </ListGroupItem>
                                 </ListGroup>
