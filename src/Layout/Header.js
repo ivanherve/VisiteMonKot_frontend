@@ -64,10 +64,10 @@ class Header extends Component {
                         <Navbar.Collapse id="responsive-navbar-nav">
                             <Nav className="mr-auto">
                                 <Nav.Item>
-                                    <Link className="nav-link" to="/annonces">Mes annonces</Link>
+                                    <Link className="nav-link" to="/advertisments">Mes annonces</Link>
                                 </Nav.Item>
                                 <Nav.Item>
-                                    <Link className="nav-link" to="/visites">Mes visiteurs</Link>
+                                    <Link className="nav-link" to="/visits">Mes visiteurs</Link>
                                 </Nav.Item>
                             </Nav>
                             <Nav>

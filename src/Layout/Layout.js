@@ -37,8 +37,8 @@ class Layout extends Component {
               ? // If signed In
               <Switch>
                 <Route path='/accomodations' component={AccomodationsList} />
-                <Route path='/annonces' component={MyAdvertisments} />
-                <Route path='/visites' component={VisitsList} />
+                <Route path='/advertisments' component={MyAdvertisments} />
+                <Route path='/visits' component={VisitsList} />
                 <Route path='/resetpwd' component={ResetPwd} />
                 <Route path='/contact' component={Contact} />
                 <Route path='/profile' component={Profile} />
