@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCog, faSignOutAlt, faUser, faWifi, faBed, faCar } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faSignOutAlt, faUser, faWifi, faBed, faCar, faEdit, faCheck, faPlus } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 // Layouts
@@ -14,7 +14,10 @@ library.add(
   faUser,
   faWifi,
   faBed,
-  faCar
+  faCar,
+  faEdit,
+  faCheck,
+  faPlus
 );
 
 class App extends Component {
