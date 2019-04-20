@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Col, Container, ListGroup, Row, Image, Button, Overlay, Form, FormControl, CardGroup, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Col, Container, ListGroup, Row, Image, Button, Overlay, Form, FormControl, CardGroup, Card, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
 import StickyBox from "react-sticky-box";
 
 import '../../App.css';
@@ -11,6 +11,7 @@ import bedroom from '../../Pictures/bedroom-ex.jpg';
 import { apiUrl } from '../../router';
 import SideBarFilter from '../Sidebars/sidebarFilter';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
+import VisitAccomodation from '../Modals/visitAccomodation';
 
 export default class AccomodationsList extends Component {
   constructor(props) {
@@ -26,6 +27,8 @@ export default class AccomodationsList extends Component {
       isSortedFromNewest: false,
       isSortedFromOldest: false,
       isSortedFromCheapest: false,
+      showToVisit: false,
+      targetAcc: {},
     }
   }
 
@@ -67,7 +70,7 @@ export default class AccomodationsList extends Component {
     this.fetchAccomodations();
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     console.log(this.state.priceMin)
   }
 
@@ -138,15 +141,15 @@ export default class AccomodationsList extends Component {
               SortedFromNewest.length > 0
                 ?
                 SortedFromNewest.map(accomo =>
-                  accomo.isStillFree === 0
-                    ?
-                    <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="danger" disabled />
-                    :
-                    accomo.nbVisit < 1
-                      ?
-                      <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="success" />
-                      :
-                      <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="warning" />
+                  <div>
+                    <AccomodationItem
+                      key={SortedFromNewest.indexOf(accomo)}
+                      accomo={accomo}
+                      variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
+                      showToVisit={() => this.setState({ showToVisit: true, targetAcc: accomo })}
+                      disabled={accomo.isStillFree === 0}
+                    />
+                  </div>
                 )
                 :
                 <div style={styles.image}>
@@ -156,13 +159,18 @@ export default class AccomodationsList extends Component {
                 </div>
             }
           </ListGroup>
+          <VisitAccomodation
+            show={this.state.showToVisit}
+            hide={() => this.setState({ showToVisit: false })}
+            accomo={this.state.targetAcc}
+          />
         </Container>
       </Row>
     );
   }
 }
 
-const AccomodationItem = ({ accomo, key, variant }) => {
+const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
   let img;
   switch (accomo.type) {
     case 'Maison': img = house;
@@ -201,7 +209,7 @@ const AccomodationItem = ({ accomo, key, variant }) => {
               sessionStorage.getItem('userData')
                 ?
                 <Col xs={2}>
-                  <Button variant={variant} disabled={variant === 'danger'}>
+                  <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger'}>
                     Visiter ?
                   </Button>
                 </Col>
