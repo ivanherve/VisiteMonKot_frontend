@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Button, Nav, Navbar, NavDropdown, Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link, Redirect } from 'react-router-dom';
 import '../App.css';
 import logo from '../logo/vmk_v5_1.svg';
@@ -66,19 +66,16 @@ class Header extends Component {
                                 <Nav.Item>
                                     <Link className="nav-link" to="/advertisments">Mes annonces</Link>
                                 </Nav.Item>
-                                <Nav.Item>
-                                    <Link className="nav-link" to="/visits">Mes visiteurs</Link>
-                                </Nav.Item>
                             </Nav>
                             <Nav>
                                 <Nav.Link>
                                     <Link className="nav-link" to="/profile"><FontAwesomeIcon icon={["fas", "user"]} /> {user.Firstname} {user.Surname}</Link>
                                 </Nav.Link>
                                 <NavDropdown title="Paramètres" className="nav-link"
-                                    //<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />+
-                                    // {Paramètres}
-                                     >
-                                    <NavDropdown.Item><Link to="/resetpwd">Modifier mon mot de passe</Link></NavDropdown.Item>
+                                //<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />+
+                                // {Paramètres}
+                                >
+                                    <NavDropdown.Item><Link to={'/profile/reset/'+user.user_id}>Modifier mon mot de passe</Link></NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item><Link to="/contact">Contacter l'équipe VisiteMonKot</Link></NavDropdown.Item>
                                 </NavDropdown>
@@ -102,18 +99,28 @@ class Header extends Component {
 
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="mr-auto">
-
+                            <Nav.Item>
+                                <Nav.Link disabled to="/advertisments">Mes annonces</Nav.Link>
+                            </Nav.Item>
                         </Nav>
                         <Nav>
+                            <Nav.Link disabled>
+                                <Link className="nav-link" to="/profile"><FontAwesomeIcon icon={["fas", "user"]} /> Profil</Link>
+                            </Nav.Link>
+                            <Nav.Link disabled>
+                                <Link className="nav-link" to="/profile">
+                                    Paramètres
+                                </Link>
+                            </Nav.Link>
                             <Nav.Link href="/login" eventKey={2}>
                                 <Button style={styles.links}>
-                                    Connexion
+                                    Connexion / Inscription
                                 </Button>
                             </Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
-            </div>
+            </div >
         );
     }
 }
