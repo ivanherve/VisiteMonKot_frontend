@@ -1,22 +1,50 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Col, Container, ListGroup, Row, Image, Button, Overlay, Form, FormControl } from 'react-bootstrap';
+import { Col, Container, ListGroup, Row, Image, Button, Overlay, Form, FormControl, CardGroup, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import StickyBox from "react-sticky-box";
+
 import '../../App.css';
 import building from '../../Pictures/building.png';
 import house from '../../Pictures/house-example.jpg';
 import garage from '../../Pictures/garage-example.jpg';
 import bedroom from '../../Pictures/bedroom-ex.jpg';
 import { apiUrl } from '../../router';
+import SideBarFilter from '../Sidebars/sidebarFilter';
+import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 
 export default class AccomodationsList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      accomodations: []
+      accomodations: [],
+      query: '',
+      priceMin: 0,
+      priceMax: 0,
+      max: 0,
+      types: [],
+      oneType: '',
+      isSortedFromNewest: false,
+      isSortedFromOldest: false,
+      isSortedFromCheapest: false,
     }
   }
 
+  fetchTypes = () => {
+    fetch(apiUrl + 'types')
+      .then(response => response.json())
+      .then(res => {
+        if (res.status === 'error') {
+          alert(res.response[0]);
+          console.log(res.response)
+        } else {
+          console.log(res.response);
+          this.setState({ types: res.response })
+        }
+      })
+  }
+
   fetchAccomodations = () => {
+    let arr = [];
     fetch(apiUrl + 'accomodations')
       .then(response => response.json())
       .then(res => {
@@ -24,7 +52,13 @@ export default class AccomodationsList extends Component {
           alert(res.response[0]);
           console.log(res.response[1]);
         } else {
-          this.setState({ accomodations: res.response })
+          this.setState({ accomodations: res.response });
+          res.response.map(el =>
+            arr.push(el.priceCharges + el.priceRent)
+          );
+          this.setState({ priceMax: Math.max(...arr) });
+          this.setState({ max: Math.max(...arr) });
+          this.fetchTypes();
         }
       })
   }
@@ -33,30 +67,97 @@ export default class AccomodationsList extends Component {
     this.fetchAccomodations();
   }
 
+  componentDidUpdate(){
+    console.log(this.state.priceMin)
+  }
+
   render() {
+    let filteredAccomodation = this.state.accomodations.filter(
+      acc => {
+        return acc.Title.toLowerCase().indexOf(this.state.query) !== -1;
+      }
+    );
+    let filteredFromMinPrice = filteredAccomodation.filter(
+      acc => {
+        let price = acc.priceRent + acc.priceCharges;
+        return price >= this.state.priceMin;
+      }
+    );
+    let filteredFromMaxPrice = filteredFromMinPrice.filter(
+      acc => {
+        let price = acc.priceRent + acc.priceCharges;
+        return price < this.state.priceMax;
+      }
+    );
+    let filteredByType = filteredFromMaxPrice.filter(
+      acc => {
+        if (this.state.oneType.length < 1) {
+          return acc;
+        } else {
+          return acc.type === this.state.oneType;
+        }
+      }
+    );
+    let SortedFromNewest = this.state.isSortedFromNewest ? filteredByType.sort(
+      (a, b) => (a.PublicationDate < b.PublicationDate) ? 1 : ((b.PublicationDate < a.PublicationDate) ? -1 : 0)
+    ) : this.state.isSortedFromOldest ? filteredByType.sort(
+      (a, b) => (a.PublicationDate > b.PublicationDate) ? 1 : ((b.PublicationDate > a.PublicationDate) ? -1 : 0)
+    ) : this.state.isSortedFromCheapest ? filteredByType.sort(
+      (a, b) => ((a.priceRent + a.priceCharges) > (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) > (a.priceRent + a.priceCharges)) ? -1 : 0)
+    ) : filteredByType;
     return (
-      <Container>
-        <h1>Logements</h1>
-        <Form inline style={{marginBottom: '10px'}}>
-          <FormControl type="text" placeholder="Nom de logement" style={{width: '88.25%'}} className="mr-sm-4" />
-          <Button variant="outline-success">Rechercher</Button>
-        </Form>
-        <ListGroup>
-          {
-            this.state.accomodations.map(accomo =>
-              accomo.isStillFree === 0
+      <Row>
+        <div style={{ marginTop: '10px', marginLeft: '10px' }}>
+          <StickyBox offsetTop={10} offsetBottom={70}>
+            <SideBarFilter
+              filterMin={e => this.setState({ priceMin: e.target.value })}
+              filterMax={e => this.setState({ priceMax: e.target.value })}
+              types={this.state.types}
+              change={(e) => e.target.id !== 'Tout' ? this.setState({ oneType: e.target.id }) : this.setState({ oneType: '' })}
+              sortfromnewest={() => this.setState({ isSortedFromNewest: true, isSortedFromOldest: false })}
+              sortfromoldest={() => this.setState({ isSortedFromOldest: true, isSortedFromNewest: false })}
+              sortfromcheapest={() => this.setState({ isSortedFromOldest: false, isSortedFromNewest: false, isSortedFromCheapest: true })}
+              min={this.state.priceMin === 0 ? this.state.max : this.state.priceMin}
+            />
+          </StickyBox>
+        </div>
+        <Container>
+          <h1>Logements</h1>
+
+          <FormControl
+            type="text"
+            placeholder="Rechercher un nom de logement"
+            style={{ width: '100%', marginBottom: '10px' }}
+            className="mr-sm-4"
+            onChange={e => this.setState({ query: e.target.value })}
+          />
+
+
+          <ListGroup>
+            {
+              SortedFromNewest.length > 0
                 ?
-                <AccomodationItem key={this.state.accomodations.indexOf(accomo)} accomo={accomo} variant="danger" disabled />
+                SortedFromNewest.map(accomo =>
+                  accomo.isStillFree === 0
+                    ?
+                    <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="danger" disabled />
+                    :
+                    accomo.nbVisit < 1
+                      ?
+                      <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="success" />
+                      :
+                      <AccomodationItem key={SortedFromNewest.indexOf(accomo)} accomo={accomo} variant="warning" />
+                )
                 :
-                accomo.nbVisit < 1
-                  ?
-                  <AccomodationItem key={this.state.accomodations.indexOf(accomo)} accomo={accomo} variant="success" />
-                  :
-                  <AccomodationItem key={this.state.accomodations.indexOf(accomo)} accomo={accomo} variant="warning" />
-            )
-          }
-        </ListGroup>
-      </Container>
+                <div style={styles.image}>
+                  <div style={styles.emptyList}>
+                    Aucun logement ne correspond à votre recherche
+                  </div>
+                </div>
+            }
+          </ListGroup>
+        </Container>
+      </Row>
     );
   }
 }
@@ -100,14 +201,17 @@ const AccomodationItem = ({ accomo, key, variant }) => {
               sessionStorage.getItem('userData')
                 ?
                 <Col xs={2}>
-                  <Button variant={variant} disabled={variant === 'danger'}>Visiter ?</Button>
+                  <Button variant={variant} disabled={variant === 'danger'}>
+                    Visiter ?
+                  </Button>
                 </Col>
                 :
                 <Col>
-                  <Overlay>
-
-                  </Overlay>
-                  <Button variant={variant} disabled>Visiter ?</Button>
+                  <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Connectez-vous d'abord</Tooltip>}>
+                    <span className="d-inline-block">
+                      <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter ?</Button>
+                    </span>
+                  </OverlayTrigger>
                 </Col>
             }
 
@@ -126,14 +230,35 @@ const AccomodationItem = ({ accomo, key, variant }) => {
             {
               accomo.HasCarPark == 1
                 ?
-                <Col xs={2}><FontAwesomeIcon icon={["fas", "car"]} /> {accomo.HasCarPark} Parking</Col>
+                <Col xs={2}><FontAwesomeIcon icon={["fas", "car"]} /> Parking</Col>
                 :
                 null
             }
             <Col xs={2}>{accomo.Surface} m<sup>2</sup></Col>
           </Row>
+          <h5 style={{ marginTop: '10px', fontStyle: 'italic' }}>Annonce de : {accomo.Firstname} {accomo.Surname}</h5>
+          <p style={{ fontSize: '0.8rem', marginTop: '10px', fontStyle: 'italic' }}>{accomo.Description}</p>
         </Col>
       </Row>
     </ListGroup.Item>
   )
+}
+
+const styles = {
+  emptyList: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '50vh',
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    color: '#00f',
+    backgroundColor: 'rgba(255, 255, 255,0.8)'
+  },
+  image: {
+    backgroundImage: 'url(' + backgroundImg + ')',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  }
 }
