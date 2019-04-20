@@ -3,6 +3,9 @@ import { ListGroup, Container, Row, Col, Button, Modal, Form } from 'react-boots
 import '../../App.css';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import AddAnnounce from '../Modals/addAnnounce';
+import { apiUrl } from '../../router';
+import DetailsAdvertisment from '../Modals/detailsAdvertisment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class MyAdvertisments extends Component {
   constructor(props, context) {
@@ -13,8 +16,12 @@ export default class MyAdvertisments extends Component {
 
     this.state = {
       showModal: false,
+      advertisments: [],
+      accomodation_id: '',
+      oneAd: {},
     };
   }
+
   handleShow() {
     this.setState({ showModal: true })
   }
@@ -23,18 +30,40 @@ export default class MyAdvertisments extends Component {
     this.setState({ showModal: false })
   }
 
+  getAdvertisment = () => {
+    fetch(apiUrl + 'advertisments', {
+      method: 'GET',
+      headers: {
+        api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+      }
+    })
+      .then(response => response.json())
+      .then(res => {
+        if (res.status === 'success') {
+          this.setState({ advertisments: res.response });
+          this.setState({ isThereAccomo: true });
+          this.setState({ oneAd: res.response[0] });
+          console.log(res.response)
+        } else {
+          this.setState({ isThereAccomo: false });
+          console.log(res.response)
+        }
+      })
+  }
+
+  showAd = (ad) => {
+    this.setState({ oneAd: ad })
+  }
+
+  componentDidMount() {
+    this.getAdvertisment();
+  }
+
   render() {
     return (
       <Container>
         <h1>Annonces</h1>
-        <Row style={{ marginBottom: '10px' }}>
-          <Col xs={6}>
-            <Button style={{ width: '100%' }} variant="success" onClick={this.handleShow}>Annoncer un logement</Button>
-          </Col>
-          <Col xs={6}>
-            <Button style={{ width: '100%' }} variant="danger" disabled={!this.state.isThereAccomo}>Supprimer un logement</Button>
-          </Col>
-        </Row>
+        <Button style={{ width: '100%', margin: '10px 0 10px 0' }} variant="outline-success" onClick={this.handleShow}><FontAwesomeIcon icon={["fas","plus"]} /> Annoncer un logement</Button>
         <AddAnnounce
           showModal={this.state.showModal}
           handleClose={this.handleClose}
@@ -42,14 +71,45 @@ export default class MyAdvertisments extends Component {
         {
           this.state.isThereAccomo
             ?
-            <ListGroup>
-              <ListGroup.Item variant="success">Available</ListGroup.Item>
-              <ListGroup.Item variant="danger">Taken</ListGroup.Item>
-              <ListGroup.Item variant="warning">Visited</ListGroup.Item>
-            </ListGroup>
+            <Row>
+              <Col xs={5}>
+                <ListGroup>
+                  {
+                    this.state.advertisments.map(adv =>
+                      <ListGroup.Item
+                        key={adv.accomodation_id}
+                        variant={adv.nbVisit > 0 ? "warning" : "success"}
+                      >
+                        <Row>
+                          <Col xs={9}>
+                            <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
+                            <Row>
+                              <Col>
+                                <div>visites : {adv.nbVisit}</div>
+                                <div style={{fontStyle: 'italic', fontSize: '0.8rem'}}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</div>
+                              </Col>
+                            </Row>
+                          </Col>
+                          <Col xs={3}>
+                            <Button style={{ width: '100%' }} variant="outline-primary" onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}>Détails</Button>
+
+                          </Col>
+                        </Row>
+
+                      </ListGroup.Item>
+                    )
+                  }
+                </ListGroup>
+              </Col>
+              <Col>
+                <DetailsAdvertisment
+                  advertisment={this.state.oneAd}
+                />
+              </Col>
+            </Row>
+
             :
             <div style={styles.image}>
-
               <div style={styles.emptyList}>
                 Vous n'avez annoncé aucun logement
               </div>
