@@ -8,12 +8,17 @@
     "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "bootstrap": "^4.3.1",
+    "deepai": "^1.0.0",
+    "jquery": "^3.4.0",
     "moment": "^2.24.0",
     "react": "^16.8.3",
     "react-bootstrap": "^1.0.0-beta.5",
+    "react-dates": "^20.1.0",
     "react-dom": "^16.8.3",
+    "react-dropzone": "^10.0.6",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.5"
+    "react-scripts": "2.1.5",
+    "react-sticky-box": "^0.8.0"
   },
   "scripts": {
     "start": "react-scripts start",
