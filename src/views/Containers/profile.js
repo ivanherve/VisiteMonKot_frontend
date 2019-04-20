@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Form, Button, Col, Row, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/fr';
 import ProfilePic from '../../Pictures/default-pic.jpg';
+import ProfileDetails from './profileDetails';
+import ResetPwd from './resetpwd';
 
 export default class Profile extends Component {
     render() {
@@ -17,61 +20,24 @@ export default class Profile extends Component {
                                 <Card.Img variant="top" src={ProfilePic} />
                                 <Card.Body>
                                     <Card.Title style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {user.Firstname} {user.Surname}
+                                        <h3>{user.Firstname} {user.Surname}</h3>
                                     </Card.Title>
-                                    <Card.Text style={{ display: 'flex', justifyContent: 'center' }}>
-                                        Some quick example text to build on the card title and make up the bulk of
-                                        the card's content.
-                                    </Card.Text>
                                 </Card.Body>
                                 <ListGroup className="list-group-flush">
-                                    <ListGroupItem>
-                                        Modifier mes informations personnelles
-                                    </ListGroupItem>
-                                    <ListGroupItem>
-                                        Modifier mon mot de passe
-                                    </ListGroupItem>
-                                    <ListGroupItem variant="danger">
+                                    <Link to={'/profile/'+user.user_id} className="list-group-item">Modifier mes informations personnelles</Link>
+                                    <Link to={'/profile/reset/'+user.user_id} className="list-group-item">Modifier mon mot de passe</Link>
+                                    <ListGroupItem variant="danger" onClick={() => alert('lala')}>
                                         Supprimer mon compte
                                     </ListGroupItem>
                                 </ListGroup>
                             </Card>
                         </Col>
                         <Col xs={9}>
-                            <Form>
-                                <Form.Group as={Row} controlId="formPlaintextEmail">
-                                    <Form.Label column sm="3">
-                                        Adresse e-mail
-                                    </Form.Label>
-                                    <Col sm="9">
-                                        <Form.Control plaintext readOnly defaultValue={user.email} />
-                                    </Col>
-                                </Form.Group>
-                                <Form.Group as={Row} controlId="formPlaintextEmail">
-                                    <Form.Label column sm="3">
-                                        Date d'inscription
-                                    </Form.Label>
-                                    <Col sm="9">
-                                        <Form.Control plaintext readOnly defaultValue={moment(user.create_time).format('LLLL')} />
-                                    </Col>
-                                </Form.Group>
-                                <Form.Group as={Row} controlId="formPlaintextEmail">
-                                    <Form.Label column sm="3">
-                                        Compte
-                                    </Form.Label>
-                                    {
-                                        user.isAccountActive === 1
-                                            ?
-                                            <Col sm="9">
-                                                <Form.Control plaintext readOnly defaultValue="Actif" style={{ color: 'green' }} />
-                                            </Col>
-                                            :
-                                            <Col sm="9">
-                                                <Form.Control plaintext readOnly defaultValue="Inactif" style={{ color: 'red' }} />
-                                            </Col>
-                                    }
-                                </Form.Group>
-                            </Form>
+                            <Switch>
+                                <Route path={'/profile/'+user.user_id} render={() => <ProfileDetails user={user} />} />
+                                <Route path={'/profile/reset/'+user.user_id} render={() => <ResetPwd />} />
+                                <Redirect from='/profile' to={'/profile/'+user.user_id} />
+                            </Switch>
                         </Col>
                     </Row>
                 </div>
