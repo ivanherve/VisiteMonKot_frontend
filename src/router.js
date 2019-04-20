@@ -1,2 +1,2 @@
 export const domain = 'localhost';
-export const apiUrl = 'http://'+domain+':8000/';
+export const apiUrl = 'http://'+domain+':8080/';
