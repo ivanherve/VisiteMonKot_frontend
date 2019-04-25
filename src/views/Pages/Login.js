@@ -45,7 +45,7 @@ class Login extends Component {
           this.setState({ redirect: true });
         }
         else {
-          alert(res.response);
+          alert('Votre adresse mail ou votre mot de passe est incorrect');
           console.log(res.response)
         }
       })
@@ -76,7 +76,7 @@ class Login extends Component {
                         <Form.Control type="email" name="email" placeholder="adresse@email.be" onChange={this.handleEmail} />
                         <Form.Text className="text-muted">
                           Cette adresse e-mail ne sera en aucun cas partagé à qui que ce soit.
-                      </Form.Text>
+                        </Form.Text>
                       </FormGroup>
                       <Form.Group controlId="formBasicPassword">
                         <Form.Label>Mot de passe</Form.Label>
