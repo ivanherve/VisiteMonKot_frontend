@@ -81,12 +81,12 @@ export default class VisitsList extends Component {
                                         <h5>{acc.priceRent} € de loyer + {acc.priceCharges} € de charges</h5>
                                         <hr />
                                         <h5>Visite prévu le </h5>
-                                        <p>{moment(acc.visitDate).format('LLLL')}</p>
+                                        <p>{moment(acc.visitDate).format('dddd Do MMMM YYYY')}</p>
                                         <h5>Annonceur</h5>
                                         <p>{acc.owner}</p>
+                                        <h5>Nb de visites: <Badge variant="warning">{acc.nbVisit}</Badge></h5>
                                         <h5>Mis à disposition</h5>
                                         <Row>
-                                            <Col xs={2}>{acc.nbVisit} visites</Col>
                                             <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {acc.nbRoom} chambres</Col>
                                             {
                                                 acc.HasWifi === 1
