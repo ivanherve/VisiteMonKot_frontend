@@ -4,7 +4,7 @@ import '../../App.css';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import AddAnnounce from '../Modals/addAnnounce';
 import { apiUrl } from '../../router';
-import DetailsAdvertisment from '../Modals/detailsAdvertisment';
+import DetailsAdvertisment from './detailsAdvertisment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class MyAdvertisments extends Component {
@@ -63,7 +63,7 @@ export default class MyAdvertisments extends Component {
     return (
       <Container>
         <h1>Annonces</h1>
-        <Button style={{ width: '100%', margin: '10px 0 10px 0' }} variant="outline-success" onClick={this.handleShow}><FontAwesomeIcon icon={["fas","plus"]} /> Annoncer un logement</Button>
+        <Button style={{ width: '100%', margin: '10px 0 10px 0' }} variant="outline-success" onClick={this.handleShow}><FontAwesomeIcon icon={["fas", "plus"]} /> Annoncer un logement</Button>
         <AddAnnounce
           showModal={this.state.showModal}
           handleClose={this.handleClose}
@@ -77,22 +77,16 @@ export default class MyAdvertisments extends Component {
                   {
                     this.state.advertisments.map(adv =>
                       <ListGroup.Item
+                        action
+                        onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}
                         key={adv.accomodation_id}
                         variant={adv.nbVisit > 0 ? "warning" : "success"}
                       >
+                        <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
                         <Row>
-                          <Col xs={9}>
-                            <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
-                            <Row>
-                              <Col>
-                                <div>visites : {adv.nbVisit}</div>
-                                <div style={{fontStyle: 'italic', fontSize: '0.8rem'}}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</div>
-                              </Col>
-                            </Row>
-                          </Col>
-                          <Col xs={3}>
-                            <Button style={{ width: '100%' }} variant="outline-primary" onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}>Détails</Button>
-
+                          <Col>
+                            <div>visites : {adv.nbVisit}</div>
+                            <div style={{ fontStyle: 'italic', fontSize: '0.8rem' }}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</div>
                           </Col>
                         </Row>
 
