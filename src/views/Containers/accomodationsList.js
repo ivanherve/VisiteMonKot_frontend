@@ -27,6 +27,10 @@ export default class AccomodationsList extends Component {
       isSortedFromNewest: false,
       isSortedFromOldest: false,
       isSortedFromCheapest: false,
+      toFilterNotVisited: false,
+      toFilterNotPublished: false,
+      toFilterWifi: false,
+      toFilterFurnitures: false,
       showToVisit: false,
       targetAcc: {},
     }
@@ -71,7 +75,7 @@ export default class AccomodationsList extends Component {
   }
 
   componentDidUpdate() {
-    console.log(this.state.priceMin)
+    console.log(this.state.priceMin);
   }
 
   render() {
@@ -101,13 +105,41 @@ export default class AccomodationsList extends Component {
         }
       }
     );
-    let SortedFromNewest = this.state.isSortedFromNewest ? filteredByType.sort(
+    let filteredNotVisited = filteredByType.filter(
+      acc => {
+        return this.state.toFilterNotVisited ? acc.nbVisit < 1 : acc;
+      }
+    );
+    let filteredNotPublished = filteredNotVisited.filter(
+      acc => {
+        return this.state.toFilterNotPublished ?
+          acc.Owner_user_id !== JSON.parse(sessionStorage.getItem('userData')).user.user_id
+          : acc;
+      }
+    );
+    let filteredWifi = filteredNotPublished.filter(
+      acc => {
+        return this.state.toFilterWifi ?
+          acc.HasWifi === 1
+          :
+          acc;
+      }
+    );
+    let filteredFurnitures = filteredWifi.filter(
+      acc => {
+        return this.state.toFilterFurnitures ?
+          acc.HasFurnitures === 1
+          :
+          acc;
+      }
+    );
+    let SortedFromNewest = this.state.isSortedFromNewest ? filteredFurnitures.sort(
       (a, b) => (a.PublicationDate < b.PublicationDate) ? 1 : ((b.PublicationDate < a.PublicationDate) ? -1 : 0)
-    ) : this.state.isSortedFromOldest ? filteredByType.sort(
+    ) : this.state.isSortedFromOldest ? filteredFurnitures.sort(
       (a, b) => (a.PublicationDate > b.PublicationDate) ? 1 : ((b.PublicationDate > a.PublicationDate) ? -1 : 0)
-    ) : this.state.isSortedFromCheapest ? filteredByType.sort(
+    ) : this.state.isSortedFromCheapest ? filteredFurnitures.sort(
       (a, b) => ((a.priceRent + a.priceCharges) > (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) > (a.priceRent + a.priceCharges)) ? -1 : 0)
-    ) : filteredByType;
+    ) : filteredFurnitures;
     return (
       <Row>
         <div style={{ marginTop: '10px', marginLeft: '10px' }}>
@@ -116,17 +148,20 @@ export default class AccomodationsList extends Component {
               filterMin={e => this.setState({ priceMin: e.target.value })}
               filterMax={e => this.setState({ priceMax: e.target.value })}
               types={this.state.types}
-              change={(e) => e.target.id !== 'Tout' ? this.setState({ oneType: e.target.id }) : this.setState({ oneType: '' })}
+              changetype={(e) => e.target.id !== 'Tout' ? this.setState({ oneType: e.target.id }) : this.setState({ oneType: '' })}
               sortfromnewest={() => this.setState({ isSortedFromNewest: true, isSortedFromOldest: false })}
               sortfromoldest={() => this.setState({ isSortedFromOldest: true, isSortedFromNewest: false })}
               sortfromcheapest={() => this.setState({ isSortedFromOldest: false, isSortedFromNewest: false, isSortedFromCheapest: true })}
+              filterNotVisited={e => this.setState({ toFilterNotVisited: document.getElementById(e.target.id).checked })}
+              filterNotPublished={e => this.setState({ toFilterNotPublished: document.getElementById(e.target.id).checked })}
+              filterWifi={e => this.setState({ toFilterWifi: document.getElementById(e.target.id).checked })}
+              filterFurnitures={e => this.setState({ toFilterFurnitures: document.getElementById(e.target.id).checked })}
               min={this.state.priceMin === 0 ? this.state.max : this.state.priceMin}
             />
           </StickyBox>
         </div>
         <Container>
           <h1>Logements</h1>
-
           <FormControl
             type="text"
             placeholder="Rechercher un nom de logement"
@@ -136,7 +171,7 @@ export default class AccomodationsList extends Component {
           />
 
 
-          <ListGroup>
+          <ListGroup variant='flush'>
             {
               SortedFromNewest.length > 0
                 ?
@@ -146,7 +181,7 @@ export default class AccomodationsList extends Component {
                       key={SortedFromNewest.indexOf(accomo)}
                       accomo={accomo}
                       variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
-                      showToVisit={() => this.setState({ showToVisit: true, targetAcc: accomo })}
+                      showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); console.log(accomo) }}
                       disabled={accomo.isStillFree === 0}
                     />
                   </div>
@@ -209,7 +244,7 @@ const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
               sessionStorage.getItem('userData')
                 ?
                 <Col xs={2}>
-                  <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger'}>
+                  <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
                     Visiter ?
                   </Button>
                 </Col>
@@ -229,16 +264,27 @@ const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
             <Col xs={2}>{accomo.nbVisit} visites</Col>
             <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom} chambres</Col>
             {
-              accomo.HasWifi == 1
+              accomo.HasWifi === 1
                 ?
                 <Col xs={2}><FontAwesomeIcon icon={["fas", "wifi"]} /> WiFi</Col>
                 :
                 null
             }
             {
-              accomo.HasCarPark == 1
+              accomo.HasCarPark === 1
                 ?
                 <Col xs={2}><FontAwesomeIcon icon={["fas", "car"]} /> Parking</Col>
+                :
+                null
+            }
+            {
+              accomo.HasFurnitures === 1
+                ?
+                <Col xs={2}>
+                  <OverlayTrigger overlay={<Tooltip>Voir les meubles</Tooltip>}>
+                    <Button variant='outline-dark'>Meublé</Button>
+                  </OverlayTrigger>
+                </Col>
                 :
                 null
             }

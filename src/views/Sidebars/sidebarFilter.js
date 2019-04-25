@@ -42,11 +42,20 @@ export default class SideBarFilter extends Component {
                                         />
                                         <Form.Check
                                             custom
-                                            type="radio"
-                                            label={<div style={{ fontSize: '0.7rem' }}>qui n'ont jamais été visité</div>}
+                                            type="checkbox"
+                                            label={<div style={{ fontSize: '0.7rem' }}>ceux qui n'ont jamais été visité</div>}
                                             name="filter"
-                                            id="f3"
+                                            id="f4"
                                             onChange={this.props.filterNotVisited}
+                                        />
+                                        <Form.Check
+                                            custom
+                                            disabled={!sessionStorage.getItem('userData')}
+                                            type="checkbox"
+                                            label={<div style={{ fontSize: '0.7rem' }}>ceux que je n'ai pas publié</div>}
+                                            name="filter"
+                                            id="f5"
+                                            onChange={this.props.filterNotPublished}
                                         />
                                     </Form>
                                 </Card.Body>
@@ -101,7 +110,7 @@ export default class SideBarFilter extends Component {
                                                     label={type.type}
                                                     name="formHorizontalRadios"
                                                     id={type.type}
-                                                    onChange={this.props.change}
+                                                    onChange={this.props.changetype}
                                                 />
                                             )
                                         }
@@ -121,29 +130,20 @@ export default class SideBarFilter extends Component {
                                         <Form.Check
                                             custom
                                             //checked
-                                            type="radio"
-                                            label='Tout'
-                                            name="formHorizontalRadios"
-                                            id='Tout'
-                                            onChange={this.props.change}
-                                        />
-                                        <Form.Check
-                                            custom
-                                            //checked
-                                            type="radio"
+                                            type="checkbox"
                                             label='WiFi'
                                             name="formHorizontalRadios"
                                             id='WiFi'
-                                            onChange={this.props.change}
+                                            onChange={this.props.filterWifi}
                                         />
                                         <Form.Check
                                             custom
                                             //checked
-                                            type="radio"
+                                            type="checkbox"
                                             label='Meublé'
                                             name="formHorizontalRadios"
                                             id='Meublé'
-                                            onChange={this.props.change}
+                                            onChange={this.props.filterFurnitures}
                                         />
                                     </Form>
                                 </Card.Body>
