@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 
-import { DateRangePicker } from 'react-dates';
+import { DateRangePicker, SingleDatePicker } from 'react-dates';
 import { apiUrl } from '../../router';
 import Axios from 'axios';
+import moment from 'moment';
 
 export default class AddAnnounce extends Component {
     constructor(props) {
@@ -14,15 +15,16 @@ export default class AddAnnounce extends Component {
         this.state = {
             startDate: null,
             endDate: null,
-            focusedInput: null,
+            focusedInputVisit: null,
+            beginingTime: null,
+            endTime: null,
+            focusedInputLive: null,
             cities: [],
             types: [],
             title: '',
             nbRoom: '',
             priceRent: '',
             priceCharges: '',
-            beginingTime: '',
-            endTime: '',
             description: '',
             hasWifi: 0,
             hasCarPark: 0,
@@ -75,8 +77,8 @@ export default class AddAnnounce extends Component {
         data.append('nbRoom', this.state.nbRoom);
         data.append('priceRent', this.state.priceRent);
         data.append('priceCharges', this.state.priceCharges);
-        data.append('BeginingTime', this.state.beginingTime);
-        data.append('EndTime', this.state.endTime);
+        data.append('BeginingTime', moment(this.state.beginingTime).format().slice(0, 10));
+        data.append('EndTime', moment(this.state.endTime).format().slice(0, 10));
         data.append('Description', this.state.description);
         data.append('HasWifi', this.state.hasWifi);
         data.append('HasCarPark', this.state.hasCarPark);
@@ -84,7 +86,9 @@ export default class AddAnnounce extends Component {
         data.append('cityName', this.state.cityName);
         data.append('Type', this.state.type);
         data.append('Surface', this.state.surface);
-        data.append('image', this.state.pictures);
+        data.append('beginingVisit', moment(this.state.startDate).format().slice(0, 10));
+        //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
+        //data.append('image', this.state.pictures);
         Axios({
             url: apiUrl + 'addadvertisments',
             method: 'post',
@@ -99,9 +103,11 @@ export default class AddAnnounce extends Component {
                     alert(res.response[0]);
                     console.log(res.response)
                 } else {
-                    alert('Annonce ajouté')
+                    alert('Annonce ajouté');
+                    this.props.handleClose();
+                    window.location.reload();
                 }
-            }, err => {alert(err); console.log(this.state.pictures)})
+            }, err => { alert(err); console.log(this.state.pictures) })
     }
 
     componentDidMount() {
@@ -118,7 +124,7 @@ export default class AddAnnounce extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton bg="success">
+                <Modal.Header closebutton bg="success">
                     <Modal.Title>Annoncer un logement</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ overflowY: 'auto' }}>
@@ -132,11 +138,28 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Form.Control placeholder="Charges €*" name="priceCharges" min="0" type="number" required onChange={e => this.setState({ priceCharges: e.target.value })} />
                         <br />
-                        <Form.Label>Date de début *</Form.Label>
-                        <Form.Control name="BeginingTime" type="date" required onChange={e => this.setState({ beginingTime: e.target.value })} />
+                        <Form.Label>Durée de bail *</Form.Label>
                         <br />
-                        <Form.Label>Date de fin *</Form.Label>
-                        <Form.Control name="EndTime" type="date" required onChange={e => this.setState({ endTime: e.target.value })} />
+                        <DateRangePicker
+                            startDateId="beginingTime"
+                            endDateId="endTime"
+                            startDate={this.state.beginingTime}
+                            endDate={this.state.endTime}
+                            onDatesChange={({ startDate, endDate }) => { this.setState({ beginingTime: startDate, endTime: endDate }) }}
+                            focusedInput={this.state.focusedInputLive}
+                            onFocusChange={(focusedInputLive) => { this.setState({ focusedInputLive }) }}
+                        />
+                        <br />
+                        <Form.Label>Dates de visite *</Form.Label>
+                        <br />
+                        <SingleDatePicker
+                            id="startDate" // PropTypes.string.isRequired,
+                            date={this.state.startDate} // momentPropTypes.momentObj or null
+                            onDateChange={visitDate => this.setState({ startDate: visitDate })} // PropTypes.func.isRequired
+                            focused={this.state.focusedInputVisit} // PropTypes.bool
+                            onFocusChange={( {focused} ) => this.setState({ focusedInputVisit: focused })} // PropTypes.func.isRequired
+                        />
+                        <br />
                         <br />
                         <div>
                             <Form.Check
@@ -187,6 +210,10 @@ export default class AddAnnounce extends Component {
                         </div>
                         <br />
                         <Form.Control placeholder="Description *" name="Description" type="text" as="textarea" required onChange={e => this.setState({ description: e.target.value })} />
+                        <br />                        
+                        <Form.Label>Surface *</Form.Label>
+                        <br />
+                        <Form.Control placeholder="Nombre de m2*" min="10" name="Surface" type="number" required onChange={e => this.setState({ surface: e.target.value })} />
                         <br />
                         <Form.Label>Dans quelle ville ? *</Form.Label>
                         <Form.Control as="select" name="City" required onChange={e => console.log(e)}>
@@ -218,21 +245,6 @@ export default class AddAnnounce extends Component {
                         <Form.Label>Ajoutez quelques Photos *</Form.Label>
                         <input className="form-control" type="file" name="Pictures" onChange={e => this.setState({ pictures: e.target.files[0] })} required multiple />
                         <br />
-                        <Form.Label>Date de visite *</Form.Label>
-                        <br />
-                        <DateRangePicker
-                            startDateId="startDate"
-                            endDateId="endDate"
-                            startDate={this.state.startDate}
-                            endDate={this.state.endDate}
-                            onDatesChange={({ startDate, endDate }) => { this.setState({ startDate, endDate }) }}
-                            focusedInput={this.state.focusedInput}
-                            onFocusChange={(focusedInput) => { this.setState({ focusedInput }) }}
-                        />
-                        <br />
-                        <Form.Label>Surface *</Form.Label>
-                        <br />
-                        <Form.Control placeholder="Nombre de m2*" min="10" name="Surface" type="number" required onChange={e => this.setState({ surface: e.target.value })} />
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
