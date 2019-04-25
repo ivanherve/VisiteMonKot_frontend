@@ -3,9 +3,11 @@ import { Card, ListGroup, Col, Button, Row, Badge, Modal, Form } from 'react-boo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import 'moment/locale/fr';
-import EditAccomodation from './editAccomodation';
-import RentAccomodation from './rentAccomodation';
-import FreeAccomodation from './freeAccomodation';
+import EditAccomodation from '../Modals/editAccomodation';
+import RentAccomodation from '../Modals/rentAccomodation';
+import FreeAccomodation from '../Modals/freeAccomodation';
+import VisitorsList from '../Modals/visitorsList';
+import { apiUrl } from '../../router';
 
 export default class DetailsAdvertisment extends Component {
     constructor() {
@@ -14,27 +16,52 @@ export default class DetailsAdvertisment extends Component {
             showModal: false,
             showRent: false,
             showFree: false,
+            showVisitors: false,
+            visitors: [],
         }
     }
 
-    componentDidMount() {
-        console.log(this.props.advertisment)
+    getVisitors = (id) => {
+        fetch(apiUrl+'getvisitors/'+id,{
+            method: 'get',
+            headers: {
+                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+            },
+        })
+        .then(response => response.json())
+        .then(res => {
+            if(res.status === 'error'){
+                alert(res.response);
+                console.log(res.response)
+            } else {
+                console.log(res.response);
+                this.setState({visitors: res.response})
+            }
+        })
     }
 
-    componentDidUpdate() {
-        console.log(this.props.advertisment)
+    componentDidMount() {
+        console.log(this.props.advertisment);
+        
+    }
+
+    componentDidUpdate(nextProps) {
+        console.log(this.props.advertisment,[nextProps]);
+        if(this.props.advertisment.accomodation_id !== nextProps.advertisment.accomodation_id){
+            this.getVisitors(this.props.advertisment.accomodation_id);
+        }
     }
 
     render() {
         let adv = this.props.advertisment;
-        let handleClose = () => this.setState({ showModal: false, showRent: false, showFree: false })
+        let handleClose = () => this.setState({ showModal: false, showRent: false, showFree: false, showVisitors: false })
         return (
             <Card>
                 <Card.Header closeButton bg="success">
                     <Row>
                         <Col xs={9}><Card.Title>{adv.Title}</Card.Title></Col>
                         <Col xs={3}>
-                            <Button style={{ width: '100%' }} variant="outline-primary" onClick={() => this.setState({ showModal: true })}>
+                            <Button style={{ width: '100%' }} variant="outline-secondary" onClick={() => this.setState({ showModal: true })}>
                                 Modifier <FontAwesomeIcon icon={["fas", "edit"]} />
                             </Button>
                             {
@@ -48,15 +75,17 @@ export default class DetailsAdvertisment extends Component {
                                         Libéré <FontAwesomeIcon icon={["fas", "check"]} />
                                     </Button>
                             }
+                            <Button style={{ width: '100%' }} onClick={() => this.setState({showVisitors: true})} variant='outline-primary'>Visite à venir</Button>
                         </Col>
                     </Row>
                 </Card.Header>
                 <ListGroup variant="flush">
                     <ListGroup.Item>Prix des charges :      <Badge variant="info" style={{ fontSize: '1.25rem' }}>{adv.priceCharges} €</Badge></ListGroup.Item>
                     <ListGroup.Item>Prix du loyer :         <Badge variant="info" style={{ fontSize: '1.25rem' }}>{adv.priceRent} €</Badge></ListGroup.Item>
-                    <ListGroup.Item>Date de publication :   {moment(adv.PublicationDate).add(2, 'hours').format('LLLL')} </ListGroup.Item>
+                    <ListGroup.Item>Date de publication :   {moment(adv.PublicationDate).add(2, 'hours').format('LL')} </ListGroup.Item>
                     <ListGroup.Item>Status :                <Badge variant={adv.isStillFree === 1 ? "warning" : "success"} style={{ fontSize: '1.25rem' }}>{adv.isStillFree === 1 ? "Libre" : "Loué"}</Badge></ListGroup.Item>
                     <ListGroup.Item>Visité <Badge variant={adv.nbVisit > 0 ? "success" : "warning"} style={{ fontSize: '1rem' }}>{adv.nbVisit}</Badge> fois</ListGroup.Item>
+
                 </ListGroup>
                 <EditAccomodation
                     handleClose={handleClose}
@@ -65,6 +94,7 @@ export default class DetailsAdvertisment extends Component {
                 />
                 <RentAccomodation showModal={this.state.showRent} onHide={handleClose} accId={adv.accomodation_id} />
                 <FreeAccomodation showModal={this.state.showFree} onHide={handleClose} accId={adv.accomodation_id} />
+                <VisitorsList showModal={this.state.showVisitors} onHide={handleClose} visitors={this.state.visitors} />
             </Card>
         )
     }
