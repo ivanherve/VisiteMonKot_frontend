@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Card, CardGroup, Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 //import '../../App.css';
 import backgroundImg from '../../logo/Accommodation-background.jpg';
 import { apiUrl } from '../../router';

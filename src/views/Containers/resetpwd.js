@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { apiUrl } from '../../router';
 
 export default class ResetPwd extends Component {

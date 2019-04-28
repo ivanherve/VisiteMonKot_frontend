@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Container, Form, Button, Col, Row, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
-import { Link, Switch, Route, Redirect } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/fr';
+import React, { Component } from 'react';
+import { Card, Col, Container, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import ProfilePic from '../../Pictures/default-pic.jpg';
 import ProfileDetails from './profileDetails';
 import ResetPwd from './resetpwd';

@@ -1,11 +1,11 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { ListGroup, Container, Row, Col, Button, Modal, Form } from 'react-bootstrap';
+import { Button, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import '../../App.css';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
-import AddAnnounce from '../Modals/addAnnounce';
 import { apiUrl } from '../../router';
+import AddAnnounce from '../Modals/addAnnounce';
 import DetailsAdvertisment from './detailsAdvertisment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class MyAdvertisments extends Component {
   constructor(props, context) {
@@ -89,7 +89,6 @@ export default class MyAdvertisments extends Component {
                             <div style={{ fontStyle: 'italic', fontSize: '0.8rem' }}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</div>
                           </Col>
                         </Row>
-
                       </ListGroup.Item>
                     )
                   }
