@@ -1,7 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCog, faSignOutAlt, faUser, faWifi, faBed, faCar, faEdit, faCheck, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // Layouts
 import Layout from './Layout/Layout';
 import Login from './views/Pages/Login';

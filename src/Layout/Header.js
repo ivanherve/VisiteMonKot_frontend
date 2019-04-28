@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Nav, Navbar, NavDropdown, Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Link, Redirect } from 'react-router-dom';
+import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import '../App.css';
 import logo from '../logo/vmk_v5_1.svg';
 import { apiUrl } from '../router';
@@ -16,7 +16,7 @@ class Header extends Component {
     }
     signOut = () => {
         fetch(apiUrl + 'signout', {
-            method: 'post',
+            method: 'get',
             headers: {
                 api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
             }
@@ -65,6 +65,12 @@ class Header extends Component {
                             <Nav className="mr-auto">
                                 <Nav.Item>
                                     <Link className="nav-link" to="/advertisments">Mes annonces</Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Link className="nav-link" to="/visits">Mes visites</Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Link className="nav-link" to="/test">Test</Link>
                                 </Nav.Item>
                             </Nav>
                             <Nav>

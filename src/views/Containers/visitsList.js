@@ -1,10 +1,10 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import moment from 'moment';
 import React, { Component } from 'react';
-import { ListGroup, Container, Col, Card, Row, Button, Overlay, OverlayTrigger, Tooltip, Badge } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import '../../App.css';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import { apiUrl } from '../../router';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import moment from 'moment';
 
 export default class VisitsList extends Component {
     constructor() {

@@ -9,6 +9,8 @@ import Headers from './Header';
 import ResetPwd from '../views/Containers/resetpwd';
 import Contact from '../views/Containers/contact';
 import Profile from '../views/Containers/profile';
+import { Button } from 'react-bootstrap';
+import { apiUrl } from '../router';
 
 
 class Layout extends Component {
@@ -42,6 +44,21 @@ class Layout extends Component {
                 <Route path='/resetpwd' component={ResetPwd} />
                 <Route path='/contact' component={Contact} />
                 <Route path='/profile' component={Profile} />
+                <Route path='/test' render={() => 
+                  <div>
+                    <input type='file' name='files[]' multiple />
+                    <Button onClick={() => {
+                      let data = new FormData()
+                      fetch(apiUrl+'uploadimages',{
+                        method: 'post',
+                        headers:{
+                          api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                        },
+                        body: data,
+                      }).then(response => response.json()).then(res => console.log(res))
+                    }}>send</Button>
+                  </div>
+                } />
                 <Redirect from="/" to="/accomodations" />
               </Switch>
               : // If signed Out

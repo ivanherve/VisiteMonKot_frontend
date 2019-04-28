@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Form, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Button, Card, Form } from 'react-bootstrap';
 import { apiUrl } from '../../router';
 
 export default class SignUp extends Component {

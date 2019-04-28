@@ -14,7 +14,6 @@ export default class EditAccomodation extends Component {
             description: '',
             priceCharges: 0,
             priceRent: 0,
-            description: ''
         }
     }
 

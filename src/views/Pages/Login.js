@@ -40,7 +40,7 @@ class Login extends Component {
     })
       .then(response => response.json())
       .then(res => {
-        if (res.status == 'success') {
+        if (res.status === 'success') {
           sessionStorage.setItem('userData', JSON.stringify(res.response));
           this.setState({ redirect: true });
         }
