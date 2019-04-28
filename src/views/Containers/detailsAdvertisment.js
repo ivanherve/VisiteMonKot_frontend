@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
-import { Card, ListGroup, Col, Button, Row, Badge, Modal, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import 'moment/locale/fr';
-import EditAccomodation from '../Modals/editAccomodation';
-import RentAccomodation from '../Modals/rentAccomodation';
-import FreeAccomodation from '../Modals/freeAccomodation';
-import VisitorsList from '../Modals/visitorsList';
+import React, { Component } from 'react';
+import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { apiUrl } from '../../router';
+import EditAccomodation from '../Modals/editAccomodation';
+import FreeAccomodation from '../Modals/freeAccomodation';
+import RentAccomodation from '../Modals/rentAccomodation';
+import VisitorsList from '../Modals/visitorsList';
 
 export default class DetailsAdvertisment extends Component {
     constructor() {
@@ -31,7 +31,7 @@ export default class DetailsAdvertisment extends Component {
         .then(response => response.json())
         .then(res => {
             if(res.status === 'error'){
-                alert(res.response);
+                //alert(res.response);
                 console.log(res.response)
             } else {
                 console.log(res.response);
@@ -85,7 +85,7 @@ export default class DetailsAdvertisment extends Component {
                     <ListGroup.Item>Date de publication :   {moment(adv.PublicationDate).add(2, 'hours').format('LL')} </ListGroup.Item>
                     <ListGroup.Item>Status :                <Badge variant={adv.isStillFree === 1 ? "warning" : "success"} style={{ fontSize: '1.25rem' }}>{adv.isStillFree === 1 ? "Libre" : "Loué"}</Badge></ListGroup.Item>
                     <ListGroup.Item>Visité <Badge variant={adv.nbVisit > 0 ? "success" : "warning"} style={{ fontSize: '1rem' }}>{adv.nbVisit}</Badge> fois</ListGroup.Item>
-
+                    <ListGroup.Item>Adresse : {`${adv.address}, ${adv.cityName}`}</ListGroup.Item>
                 </ListGroup>
                 <EditAccomodation
                     handleClose={handleClose}

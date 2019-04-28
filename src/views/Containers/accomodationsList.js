@@ -1,17 +1,17 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Col, Container, ListGroup, Row, Image, Button, Overlay, Form, FormControl, CardGroup, Card, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
+import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import StickyBox from "react-sticky-box";
-
 import '../../App.css';
-import building from '../../Pictures/building.png';
-import house from '../../Pictures/house-example.jpg';
-import garage from '../../Pictures/garage-example.jpg';
 import bedroom from '../../Pictures/bedroom-ex.jpg';
-import { apiUrl } from '../../router';
-import SideBarFilter from '../Sidebars/sidebarFilter';
+import building from '../../Pictures/building.png';
+import garage from '../../Pictures/garage-example.jpg';
+import house from '../../Pictures/house-example.jpg';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
+import { apiUrl } from '../../router';
 import VisitAccomodation from '../Modals/visitAccomodation';
+import SideBarFilter from '../Sidebars/sidebarFilter';
+
 
 export default class AccomodationsList extends Component {
   constructor(props) {
@@ -236,6 +236,7 @@ const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
             <Col xs={10}>
               <h3>{accomo.Title}</h3>
               <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
+              <p>{accomo.addressVisible === 1 ? 'Adresse: '+accomo.address+', '+accomo.cityName : null}</p>
               <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
                 <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
               </p>
