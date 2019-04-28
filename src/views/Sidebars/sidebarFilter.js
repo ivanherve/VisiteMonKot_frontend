@@ -100,7 +100,7 @@ export default class SideBarFilter extends Component {
                                             label='Tout'
                                             name="formHorizontalRadios"
                                             id='Tout'
-                                            onChange={this.props.change}
+                                            onChange={this.props.changetype}
                                         />
                                         {/**/
                                             this.props.types.map(type =>
