@@ -64,6 +64,7 @@ export default class AccomodationsList extends Component {
             arr.push(el.priceCharges + el.priceRent)
           );
           this.setState({ priceMax: Math.max(...arr) });
+          console.log(Math.max(...arr));
           this.setState({ max: Math.max(...arr) });
           this.fetchTypes();
         }
@@ -74,8 +75,11 @@ export default class AccomodationsList extends Component {
     this.fetchAccomodations();
   }
 
-  componentDidUpdate() {
-    console.log(this.state.priceMin);
+  componentDidUpdate(nextProps, nextState) {
+    console.log([this.state.priceMax,nextState.max]);
+    if((this.state.priceMax === 0 || this.state.priceMax === "") && this.state.priceMax !== this.state.max){
+      this.setState({priceMax: this.state.max});
+    }
   }
 
   render() {
@@ -93,7 +97,7 @@ export default class AccomodationsList extends Component {
     let filteredFromMaxPrice = filteredFromMinPrice.filter(
       acc => {
         let price = acc.priceRent + acc.priceCharges;
-        return price < this.state.priceMax;
+        return price <= this.state.priceMax;
       }
     );
     let filteredByType = filteredFromMaxPrice.filter(
