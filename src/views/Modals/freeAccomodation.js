@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { apiUrl } from '../../router';
+import swal from 'sweetalert';
 
 export default class FreeAccomodation extends Component {
     constructor(){
@@ -24,10 +25,10 @@ export default class FreeAccomodation extends Component {
         .then(response => response.json())
         .then(res => {
             if(res.status === 'error'){
-                alert(res.response[0]);
+                swal(res.response[0]);
                 console.log(res.response)
             } else {
-                alert('Ce logement est libéré');
+                swal('Ce logement est libéré');
                 this.setState({status: 0});
                 this.props.onHide();
                 window.location.reload();

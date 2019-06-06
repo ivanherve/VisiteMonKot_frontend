@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import backgroundImg from '../../logo/Accommodation-background.jpg';
 import { apiUrl } from '../../router';
 import SignUp from './SignUp';
+import swal from 'sweetalert';
 
 class Login extends Component {
   constructor(props) {
@@ -45,7 +46,7 @@ class Login extends Component {
           this.setState({ redirect: true });
         }
         else {
-          alert('Votre adresse mail ou votre mot de passe est incorrect');
+          swal('Votre adresse mail ou votre mot de passe est incorrect');
           console.log(res.response)
         }
       })

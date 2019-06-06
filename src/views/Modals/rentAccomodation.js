@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { apiUrl } from '../../router';
+import swal from 'sweetalert';
 
 export default class RentAccomodation extends Component {
     constructor(){
@@ -24,10 +25,10 @@ export default class RentAccomodation extends Component {
         .then(response => response.json())
         .then(res => {
             if(res.status === 'error'){
-                alert(res.response[0]);
+                swal(res.response[0]);
                 console.log(res.response)
             } else {
-                alert('Ce logement est loué');
+                swal('Ce logement est loué');
                 this.setState({status: 1});
                 this.props.onHide();
                 window.location.reload();

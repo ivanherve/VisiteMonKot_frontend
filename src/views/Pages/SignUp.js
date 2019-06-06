@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import { apiUrl } from '../../router';
+import swal from 'sweetalert';
 
 export default class SignUp extends Component {
     constructor() {
@@ -29,7 +30,7 @@ export default class SignUp extends Component {
                     this.props.redirection();
                 }
                 else {
-                    alert(res.response);
+                    swal(res.response);
                     console.log(res.response)
                 }
             })
@@ -37,7 +38,7 @@ export default class SignUp extends Component {
 
     signUp = () => {
         if (this.state.password !== this.state.pswToConfirm) {
-            alert('Les mots de passes ne correspondent pas entre eux')
+            swal('Les mots de passes ne correspondent pas entre eux')
         } else {
             let data = new FormData();
             data.append('email', this.state.email);
@@ -55,7 +56,7 @@ export default class SignUp extends Component {
                         console.log(res.response)
                     }
                     else {
-                        alert(res.response);
+                        swal(res.response);
                         console.log(res.response)
                     }
                 })
@@ -79,7 +80,7 @@ export default class SignUp extends Component {
                     <Form.Control placeholder="Confirmer votre mot de passe*" name="passwordtoconfirm" minLength="8" type="password" required onChange={e => this.setState({pswToConfirm: e.target.value})} />
                     <br />
                     <Button color="primary" name="Register" onClick={() => {
-                        if(this.state.password !== this.state.pswToConfirm) alert('Les mots de passes ne sont pas identiques');
+                        if(this.state.password !== this.state.pswToConfirm) swal('Les mots de passes ne sont pas identiques');
                         else this.signUp();
                     }}>
                         Inscrivez-vous maintenant!

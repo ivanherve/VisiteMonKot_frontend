@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { apiUrl } from '../../router';
+import swal from 'sweetalert';
 
 export default class ResetPwd extends Component {
     constructor(props) {
@@ -30,10 +31,10 @@ export default class ResetPwd extends Component {
             .then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    alert(res.response);
+                    swal(res.response);
                     console.log(res.response)
                 } else {
-                    alert(res.response);
+                    swal(res.response);
                     window.location.href = '/'
                 }
             })

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import '../App.css';
 import logo from '../logo/vmk_v5_1.svg';
 import { apiUrl } from '../router';
+import swal from 'sweetalert';
 
 class Header extends Component {
     constructor(props) {
@@ -27,7 +28,7 @@ class Header extends Component {
                     sessionStorage.setItem('userData', '');
                     sessionStorage.clear();
                     //this.setState({redirect: true});
-                    alert(res.response);
+                    swal(res.response);
                     //return (<Redirect to='/login' />)
                     this.props.onClick();
                 }
@@ -69,9 +70,11 @@ class Header extends Component {
                                 <Nav.Item>
                                     <Link className="nav-link" to="/visits">Mes visites</Link>
                                 </Nav.Item>
+                                {/*
                                 <Nav.Item>
                                     <Link className="nav-link" to="/test">Test</Link>
-                                </Nav.Item>
+                                </Nav.Item>*/
+                                }
                             </Nav>
                             <Nav>
                                 <Nav.Link>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import moment from 'moment';
 import { apiUrl } from '../../router';
+import swal from 'sweetalert';
 
 export default class EditAccomodation extends Component {
     constructor(props) {
@@ -61,10 +62,10 @@ export default class EditAccomodation extends Component {
             .then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    alert(res.response[0]);
+                    swal(res.response[0]);
                     console.log(res.response)
                 } else {
-                    alert('Logement mis à jour');
+                    swal('Logement mis à jour');
                     this.props.handleClose();
                     window.location.reload();
                 }
