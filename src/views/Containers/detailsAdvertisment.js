@@ -22,32 +22,32 @@ export default class DetailsAdvertisment extends Component {
     }
 
     getVisitors = (id) => {
-        fetch(apiUrl+'getvisitors/'+id,{
+        fetch(apiUrl + 'getvisitors/' + id, {
             method: 'get',
             headers: {
                 api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
         })
-        .then(response => response.json())
-        .then(res => {
-            if(res.status === 'error'){
-                //alert(res.response);
-                console.log(res.response)
-            } else {
-                console.log(res.response);
-                this.setState({visitors: res.response})
-            }
-        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'error') {
+                    //swal(res.response);
+                    console.log(res.response)
+                } else {
+                    console.log(res.response);
+                    this.setState({ visitors: res.response })
+                }
+            })
     }
 
     componentDidMount() {
         console.log(this.props.advertisment);
-        
+
     }
 
     componentDidUpdate(nextProps) {
-        console.log(this.props.advertisment,[nextProps]);
-        if(this.props.advertisment.accomodation_id !== nextProps.advertisment.accomodation_id){
+        console.log(this.props.advertisment, [nextProps]);
+        if (this.props.advertisment.accomodation_id !== nextProps.advertisment.accomodation_id) {
             this.getVisitors(this.props.advertisment.accomodation_id);
         }
     }
@@ -75,7 +75,13 @@ export default class DetailsAdvertisment extends Component {
                                         Libéré <FontAwesomeIcon icon={["fas", "check"]} />
                                     </Button>
                             }
-                            <Button style={{ width: '100%' }} onClick={() => this.setState({showVisitors: true})} variant='outline-primary'>Visite à venir</Button>
+                            <Button
+                                style={{ width: '100%' }}
+                                onClick={() => this.setState({ showVisitors: true })}
+                                variant='outline-primary'
+                            >
+                                Visite à venir
+                            </Button>
                         </Col>
                     </Row>
                 </Card.Header>
