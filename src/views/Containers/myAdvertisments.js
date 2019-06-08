@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Col, Container, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col, Container, ListGroup, Row, Badge } from 'react-bootstrap';
 import '../../App.css';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import { apiUrl } from '../../router';
@@ -86,7 +86,9 @@ export default class MyAdvertisments extends Component {
                         <Row>
                           <Col>
                             <div>visites : {adv.nbVisit}</div>
-                            <div style={{ fontStyle: 'italic', fontSize: '0.8rem' }}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</div>
+                            <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>
+                              <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge> 
+                            </div>
                           </Col>
                         </Row>
                       </ListGroup.Item>
