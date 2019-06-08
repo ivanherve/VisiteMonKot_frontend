@@ -25,7 +25,7 @@ export default class VisitsList extends Component {
             .then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    alert(res.response[0]);
+                    //alert(res.response[0]);
                     console.log(res.response)
                 } else {
                     this.setState({ accomodations: res.response });
