@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip, Badge, Popover } from 'react-bootstrap';
 import StickyBox from "react-sticky-box";
 import '../../App.css';
 import bedroom from '../../Pictures/bedroom-ex.jpg';
@@ -11,6 +11,8 @@ import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import { apiUrl } from '../../router';
 import VisitAccomodation from '../Modals/visitAccomodation';
 import SideBarFilter from '../Sidebars/sidebarFilter';
+import swal from 'sweetalert';
+import InfiniteScroll from 'react-infinite-scroller';
 
 
 export default class AccomodationsList extends Component {
@@ -33,6 +35,8 @@ export default class AccomodationsList extends Component {
       toFilterFurnitures: false,
       showToVisit: false,
       targetAcc: {},
+      datesVisit: [],
+      hasMoreAccomo: true,
     }
   }
 
@@ -41,7 +45,7 @@ export default class AccomodationsList extends Component {
       .then(response => response.json())
       .then(res => {
         if (res.status === 'error') {
-          alert(res.response[0]);
+          swal(res.response[0]);
           console.log(res.response)
         } else {
           console.log(res.response);
@@ -50,16 +54,19 @@ export default class AccomodationsList extends Component {
       })
   }
 
-  fetchAccomodations = () => {
+  fetchAccomodations = (qty = 10) => {
     let arr = [];
-    fetch(apiUrl + 'accomodations')
+    fetch(apiUrl + 'accomodations/' + qty)
       .then(response => response.json())
       .then(res => {
         if (res.status === 'error') {
-          alert(res.response[0]);
+          swal(res.response[0]);
           console.log(res.response[1]);
         } else {
-          this.setState({ accomodations: res.response });
+          if (res.response.length === qty) {
+            this.setState({ accomodations: res.response, hasMoreAccomo: true });
+            console.log([res.response.length , qty])
+          } else this.setState({ hasMoreAccomo: false });
           res.response.map(el =>
             arr.push(el.priceCharges + el.priceRent)
           );
@@ -71,18 +78,37 @@ export default class AccomodationsList extends Component {
       })
   }
 
+  fetchVisitDate = (id) => {
+    fetch(`${apiUrl}getvisitdates/${id}`, {
+      method: 'get',
+      headers: {
+        api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+      }
+    })
+      .then(response => response.json())
+      .then(res => {
+        console.log(Object.values(res.response));
+        if (res.status === 'error') {
+          swal(res.response)
+        } else {
+          this.setState({ datesVisit: Object.values(res.response) });
+        }
+      })
+  }
+
   componentDidMount() {
     this.fetchAccomodations();
   }
 
   componentDidUpdate(nextProps, nextState) {
-    console.log([this.state.priceMax,nextState.max]);
-    if((this.state.priceMax === 0 || this.state.priceMax === "") && this.state.priceMax !== this.state.max){
-      this.setState({priceMax: this.state.max});
+    //console.log([this.state.priceMax,nextState.max]);
+    if ((this.state.priceMax === 0 || this.state.priceMax === "") && this.state.priceMax !== this.state.max) {
+      this.setState({ priceMax: this.state.max });
     }
   }
 
   render() {
+    var items = [];
     let filteredAccomodation = this.state.accomodations.filter(
       acc => {
         return acc.Title.toLowerCase().indexOf(this.state.query) !== -1;
@@ -137,13 +163,16 @@ export default class AccomodationsList extends Component {
           acc;
       }
     );
-    let SortedFromNewest = this.state.isSortedFromNewest ? filteredFurnitures.sort(
+    filteredFurnitures.map(el => {
+      items.push(el);
+    });
+    let SortedFromNewest = this.state.isSortedFromNewest ? items.sort(
       (a, b) => (a.PublicationDate < b.PublicationDate) ? 1 : ((b.PublicationDate < a.PublicationDate) ? -1 : 0)
-    ) : this.state.isSortedFromOldest ? filteredFurnitures.sort(
+    ) : this.state.isSortedFromOldest ? items.sort(
       (a, b) => (a.PublicationDate > b.PublicationDate) ? 1 : ((b.PublicationDate > a.PublicationDate) ? -1 : 0)
-    ) : this.state.isSortedFromCheapest ? filteredFurnitures.sort(
+    ) : this.state.isSortedFromCheapest ? items.sort(
       (a, b) => ((a.priceRent + a.priceCharges) > (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) > (a.priceRent + a.priceCharges)) ? -1 : 0)
-    ) : filteredFurnitures;
+    ) : items;
     return (
       <Row>
         <div style={{ marginTop: '10px', marginLeft: '10px' }}>
@@ -179,17 +208,25 @@ export default class AccomodationsList extends Component {
             {
               SortedFromNewest.length > 0
                 ?
-                SortedFromNewest.map(accomo =>
-                  <div>
-                    <AccomodationItem
-                      key={SortedFromNewest.indexOf(accomo)}
-                      accomo={accomo}
-                      variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
-                      showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); console.log(accomo) }}
-                      disabled={accomo.isStillFree === 0}
-                    />
-                  </div>
-                )
+                <InfiniteScroll
+                  pageStart={10}
+                  loadMore={this.fetchAccomodations.bind(this)}
+                  hasMore={this.state.hasMoreAccomo}
+                  loader={<div className="loader">Loading ...</div>}
+                >
+                  {
+                    SortedFromNewest.map(accomo =>
+                      <div key={SortedFromNewest.indexOf(accomo)}>
+                        <AccomodationItem
+                          accomo={accomo}
+                          variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
+                          showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); this.fetchVisitDate(accomo.accomodation_id); console.log(accomo) }}
+                          disabled={accomo.isStillFree === 0}
+                        />
+                      </div>
+                    )
+                  }
+                </InfiniteScroll>
                 :
                 <div style={styles.image}>
                   <div style={styles.emptyList}>
@@ -202,6 +239,7 @@ export default class AccomodationsList extends Component {
             show={this.state.showToVisit}
             hide={() => this.setState({ showToVisit: false })}
             accomo={this.state.targetAcc}
+            datesVisit={this.state.datesVisit}
           />
         </Container>
       </Row>
@@ -240,7 +278,7 @@ const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
             <Col xs={10}>
               <h3>{accomo.Title}</h3>
               <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
-              <p>{accomo.addressVisible === 1 ? 'Adresse: '+accomo.address+', '+accomo.cityName : null}</p>
+              <p>{accomo.addressVisible === 1 ? 'Adresse: ' + accomo.address + ', ' + accomo.cityName : null}</p>
               <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
                 <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
               </p>
@@ -286,8 +324,16 @@ const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
               accomo.HasFurnitures === 1
                 ?
                 <Col xs={2}>
-                  <OverlayTrigger overlay={<Tooltip>Voir les meubles</Tooltip>}>
-                    <Button variant='outline-dark'>Meublé</Button>
+                  <OverlayTrigger overlay={
+                    <Popover title='Meubles'>
+                      <ListGroup>
+                        <ListGroup.Item>Lit</ListGroup.Item>
+                        <ListGroup.Item>Armoire</ListGroup.Item>
+                        <ListGroup.Item>Table</ListGroup.Item>
+                      </ListGroup>
+                    </Popover>
+                  }>
+                    <Badge variant='outline-dark'>Meublé</Badge>
                   </OverlayTrigger>
                 </Col>
                 :
