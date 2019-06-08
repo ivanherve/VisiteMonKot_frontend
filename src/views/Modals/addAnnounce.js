@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Card, ListGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
@@ -10,13 +10,16 @@ import Axios from 'axios';
 import moment from 'moment';
 import CitiesList from '../Containers/CitiesList';
 import StreetList from '../Containers/StreetList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import swal from 'sweetalert';
 
 export default class AddAnnounce extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startDate: null,
-            endDate: null,
+            oneDate: null,
+            firstDate: null,
+            lastDate: null,
             focusedInputVisit: null,
             beginingTime: null,
             endTime: null,
@@ -40,6 +43,11 @@ export default class AddAnnounce extends Component {
             surface: '',
             pictures: null,
             addressVisible: 0,
+            typeDate: 0,
+            datesVisits: [],
+            datesVisitsToSend: [],
+            startTimeVisits: null,
+            endTimeVisits: null,
         };
     }
 
@@ -48,7 +56,7 @@ export default class AddAnnounce extends Component {
             .then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    alert(res.response[0]);
+                    swal(res.response[0]);
                     console.log(res.response)
                 } else {
                     console.log(res.response);
@@ -110,7 +118,7 @@ export default class AddAnnounce extends Component {
     addOneAnnounce = () => {
         let data = new FormData();
         data.append('title', this.state.title);
-        data.append('address', this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
+        data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
         data.append('nbRoom', this.state.nbRoom);
         data.append('priceRent', this.state.priceRent);
         data.append('priceCharges', this.state.priceCharges);
@@ -123,8 +131,9 @@ export default class AddAnnounce extends Component {
         data.append('cityName', this.state.cityName);
         data.append('Type', this.state.type);
         data.append('Surface', this.state.surface);
-        data.append('beginingVisit', moment(this.state.startDate).format().slice(0, 10));
+        data.append('datesVisit', JSON.stringify(this.state.datesVisitsToSend));
         data.append('addressVisible', this.state.addressVisible);
+        data.append('typeDate', this.state.typeDate.toString());
         //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
         //data.append('image', this.state.pictures);
         Axios({
@@ -138,14 +147,23 @@ export default class AddAnnounce extends Component {
             //.then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    alert(res.response[0]);
+                    swal(res.response[0]);
                     console.log(res.response)
                 } else {
-                    alert('Annonce ajouté');
-                    this.props.handleClose();
-                    window.location.reload();
+                    swal({
+                        title: 'Parfait!',
+                        text: `Annonce ajouté`,
+                        icon: 'success',
+                        button: {
+                            closeModal: false,
+                        }
+                    })
+                        .then(() => {
+                            this.props.handleClose();
+                            window.location.reload();
+                        });
                 }
-            }, err => { alert(err); console.log(this.state.pictures) })
+            }, err => { swal(err); console.log(this.state.pictures) })
     }
 
     componentDidMount() {
@@ -161,7 +179,7 @@ export default class AddAnnounce extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closebutton bg="success">
+                <Modal.Header closeButton bg="success">
                     <Modal.Title>Annoncer un logement</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ overflowY: 'auto' }}>
@@ -186,15 +204,155 @@ export default class AddAnnounce extends Component {
                             onFocusChange={(focusedInputLive) => { this.setState({ focusedInputLive }) }}
                         />
                         <br />
-                        <Form.Label>Dates de visite *</Form.Label>
                         <br />
-                        <SingleDatePicker
-                            id="startDate" // PropTypes.string.isRequired,
-                            date={this.state.startDate} // momentPropTypes.momentObj or null
-                            onDateChange={visitDate => this.setState({ startDate: visitDate })} // PropTypes.func.isRequired
-                            focused={this.state.focusedInputVisit} // PropTypes.bool
-                            onFocusChange={({ focused }) => this.setState({ focusedInputVisit: focused })} // PropTypes.func.isRequired
-                        />
+                        <Form.Label>Ajoutez une/des date(s) de visite *</Form.Label>
+                        <br />
+                        <Card>
+                            <Card.Body>
+                                <Form.Check checked={this.state.typeDate === 0} custom inline type='radio' label='Une seule date' id='chk1' name='chk1' onChange={() => this.setState({ typeDate: 0 })} />
+                                <Form.Check custom inline type='radio' label='Plusieurs dates' id='chk2' name='chk1' onChange={() => this.setState({ typeDate: 1 })} />
+                                <Form.Check custom inline type='radio' label="A partir de cette date jusqu'à location" id='chk3' name='chk1' onChange={() => this.setState({ typeDate: 2 })} />
+                                <br />
+                                <br />
+                                <Row>
+                                    <Col xs='6'>
+                                        <Form.Label>Le : </Form.Label>
+                                        <div>
+                                            {
+                                                this.state.typeDate === 0
+                                                    ?
+                                                    <SingleDatePicker
+                                                        id="addOneDate" // PropTypes.string.isRequired,
+                                                        date={this.state.oneDate} // momentPropTypes.momentObj or null
+                                                        onDateChange={visitDate => this.setState({ oneDate: visitDate })} // PropTypes.func.isRequired
+                                                        focused={this.state.focusedInputVisit} // PropTypes.bool
+                                                        onFocusChange={({ focused }) => this.setState({ focusedInputVisit: focused })} // PropTypes.func.isRequired
+                                                    />
+                                                    :
+                                                    this.state.typeDate === 1
+                                                        ?
+                                                        <DateRangePicker
+                                                            startDateId="addFirstDate"
+                                                            endDateId="addLastDate"
+                                                            startDate={this.state.firstDate}
+                                                            endDate={this.state.lastDate}
+                                                            onDatesChange={({ startDate, endDate }) => { this.setState({ firstDate: startDate, lastDate: endDate }) }}
+                                                            focusedInput={this.state.focusedInputVisit}
+                                                            onFocusChange={(focusedInputVisit) => { this.setState({ focusedInputVisit }) }}
+                                                        />
+                                                        :
+                                                        <SingleDatePicker
+                                                            id="addOneDateAtAll" // PropTypes.string.isRequired,
+                                                            date={this.state.startDate} // momentPropTypes.momentObj or null
+                                                            onDateChange={visitDate => this.setState({ startDate: visitDate })} // PropTypes.func.isRequired
+                                                            focused={this.state.focusedInputVisit} // PropTypes.bool
+                                                            onFocusChange={({ focused }) => this.setState({ focusedInputVisit: focused })} // PropTypes.func.isRequired
+                                                        />
+                                            }
+                                        </div>
+                                        {/*<Form.Control type='date' />*/}
+                                    </Col>
+                                    <Col xs={this.state.typeDate === 0 || this.state.typeDate === 1 ? '2' : '3'}>
+                                        <Form.Label>De :</Form.Label>
+                                        <Form.Control type='time' onChange={e => this.setState({ startTimeVisits: e.target.value })} />
+                                    </Col>
+                                    <Col xs={this.state.typeDate === 0 || this.state.typeDate === 1 ? '2' : '3'}>
+                                        <Form.Label>A :</Form.Label>
+                                        <Form.Control type='time' onChange={e => this.setState({ endTimeVisits: e.target.value })} />
+                                    </Col>
+                                    {
+                                        this.state.typeDate === 0
+                                            ?
+                                            <Col xs='2'>
+                                                <Form.Label style={{ color: 'white' }}>Ajouter :</Form.Label>
+                                                <div>
+                                                    <OverlayTrigger overlay={<Tooltip>Ajouter une date</Tooltip>}>
+                                                        <Button onClick={() => {
+                                                            if (!this.state.oneDate || !this.state.startTimeVisits || !this.state.endTimeVisits) swal('Insérez une date et des heures svp!')
+                                                            else this.setState({
+                                                                datesVisits: [
+                                                                    { firstDate: this.state.oneDate, lastDate: this.state.oneDate, startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisits
+                                                                ],
+                                                                datesVisitsToSend: [
+                                                                    { firstDate: moment(this.state.oneDate).format('YYYY-MM-DD'), lastDate: moment(this.state.oneDate).format('YYYY-MM-DD'), startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisitsToSend
+                                                                ],
+                                                            })
+                                                        }}>
+                                                            <FontAwesomeIcon icon={["fas", "plus"]} />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </div>
+                                            </Col>
+                                            :
+                                            this.state.typeDate === 1
+                                                ?
+                                                <Col xs='2'>
+                                                    <Form.Label style={{ color: 'white' }}>Ajouter :</Form.Label>
+                                                    <div>
+                                                        <OverlayTrigger overlay={<Tooltip>Ajouter des dates</Tooltip>}>
+                                                            <Button onClick={() => {
+                                                                if (!this.state.firstDate || !this.state.lastDate || !this.state.startTimeVisits || !this.state.endTimeVisits) swal('Insérez les dates et les heures')
+                                                                else {
+                                                                    this.setState({
+                                                                        datesVisits: [
+                                                                            { firstDate: this.state.firstDate, lastDate: this.state.lastDate, startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'success' }, ...this.state.datesVisits
+                                                                        ],
+                                                                        datesVisitsToSend: [
+                                                                            { firstDate: moment(this.state.firstDate).format('YYYY-MM-DD'), lastDate: moment(this.state.lastDate).format('YYYY-MM-DD'), startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisitsToSend
+                                                                        ],
+                                                                    })
+                                                                }
+                                                            }}>
+                                                                <FontAwesomeIcon icon={["fas", "plus"]} />
+                                                            </Button>
+                                                        </OverlayTrigger>
+                                                    </div>
+                                                </Col>
+                                                :
+                                                null
+                                    }
+                                </Row>
+                            </Card.Body>
+                            {
+                                (this.state.typeDate === 0 || this.state.typeDate === 1) && this.state.datesVisits.length > 0
+                                    ?
+                                    <div>
+                                        <ListGroup variant='flush'>
+                                            {
+                                                this.state.datesVisits.map(el =>
+                                                    <ListGroup.Item variant={el.variant} key={this.state.datesVisits.indexOf(el)}>
+                                                        <Row>
+                                                            <Col xs='2'>
+                                                                <OverlayTrigger overlay={<Tooltip>Retirer</Tooltip>}>
+                                                                    <Button variant='outline-danger' onClick={() => {
+                                                                        let array = [...this.state.datesVisits];
+                                                                        let index = array.indexOf(el)
+                                                                        array.splice(index, 1);
+                                                                        this.setState({ datesVisits: array })
+                                                                    }}>
+                                                                        <FontAwesomeIcon icon={["fas", "times"]} />
+                                                                    </Button>
+                                                                </OverlayTrigger>
+                                                            </Col>
+                                                            <Col>
+                                                                {
+                                                                    el.firstDate === el.lastDate
+                                                                        ?
+                                                                        <div>Le {moment(el.firstDate).format('Do MMMM YYYY')} de {el.startTimeVisits} à {el.endTimeVisits}</div>
+                                                                        :
+                                                                        <div>Du {moment(el.firstDate).format('Do MMMM YYYY')} au {moment(el.lastDate).format('Do MMMM YYYY')}, tous les jours entre {el.startTimeVisits} et {el.endTimeVisits}</div>
+                                                                }
+                                                            </Col>
+                                                        </Row>
+                                                    </ListGroup.Item>
+                                                )
+                                            }
+                                        </ListGroup>
+                                    </div>
+                                    :
+                                    null
+                            }
+                        </Card>
                         <br />
                         <br />
                         <div>
@@ -251,7 +409,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Row>
                             <Col>
-                                <Form.Control type='text' name="City" placeholder="Code Postal ? *" required onChange={this.handleInputChangeCity} />
+                                <Form.Control type='number' min='1000' placeholder="Code Postal ? *" required onChange={this.handleInputChangeCity} />
                                 <CitiesList
                                     results={this.state.cities}
                                     choose={e => this.setState({ cityName: e.target.innerText, cities: [] })}
@@ -264,10 +422,10 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Row>
                             <Col xs={8}>
-                                <Form.Control type='text' id='street' name="Street" disabled={this.state.cityName.length < 1} placeholder="Dans quelle rue ? *" onChange={this.handleInputChangeSt} />
+                                <Form.Control type='text' id='st' disabled={this.state.cityName.length < 1} placeholder="Dans quelle rue ? *" onChange={this.handleInputChangeSt} />
                                 <StreetList
                                     results={this.state.streets}
-                                    choose={e => { this.setState({ streetName: e.target.innerText, streets: [] }); document.getElementById('street').value = e.target.innerText }}
+                                    choose={e => { this.setState({ streetName: e.target.innerText, streets: [] }); document.getElementById('st').value = e.target.innerText }}
                                 />
                             </Col>
                             <Col>
@@ -313,7 +471,10 @@ export default class AddAnnounce extends Component {
                     <Button
                         variant="primary"
                         type="submit"
-                        onClick={() => this.addOneAnnounce()}
+                        onClick={() => {
+                            this.addOneAnnounce();
+                            //console.log(this.state.datesVisitsToSend)
+                        }}
                     >
                         Publier une annonce
                     </Button>
