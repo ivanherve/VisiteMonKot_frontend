@@ -9,12 +9,18 @@ export default class VisitorsList extends Component {
                 <Modal.Header>Liste des visiteurs</Modal.Header>
                 <ListGroup>
                     {
-                        this.props.visitors.map(v => 
-                            <ListGroup.Item action>
-                                <h5>{v.names}</h5>
-                                Le {moment(v.visitDate).format('dddd Do MMMM YYYY')}
+                        this.props.visitors.length > 0
+                            ?
+                            this.props.visitors.map(v =>
+                                <ListGroup.Item action>
+                                    <h5>{v.names}</h5>
+                                    Le {moment(v.visitDate).format('dddd Do MMMM YYYY')}
+                                </ListGroup.Item>
+                            )
+                            :
+                            <ListGroup.Item style={{display: 'flex', justifyContent: 'center'}}>
+                                Il n'y a pas encore de visiteurs
                             </ListGroup.Item>
-                        )
                     }
                 </ListGroup>
             </Modal>
