@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
 import moment from 'moment';
-import { apiUrl } from '../../router';
+import { apiUrl, API_URL_CP, API_URL_RUE } from '../../router';
 import swal from 'sweetalert';
+import CitiesList from '../Containers/CitiesList';
+import Axios from 'axios';
+import StreetList from '../Containers/StreetList';
+import $ from 'jquery';
 
 export default class EditAccomodation extends Component {
     constructor(props) {
@@ -15,31 +19,96 @@ export default class EditAccomodation extends Component {
             description: '',
             priceCharges: 0,
             priceRent: 0,
+            cityName: '',
+            query: '',
+            cities: [],
+            streetName: '',
+            streets: [],
+            addNumb: null,
+            boxNumb: null,
         }
     }
 
     componentDidMount() {
-        this.setState({ title: this.props.adv.Title });
-        this.setState({ hasWifi: this.props.adv.hasWifi });
-        this.setState({ hasFurnitures: this.props.adv.hasFurnitures });
-        this.setState({ hasCarPark: this.props.adv.hasCarPark });
-        this.setState({ description: this.props.adv.description });
-        this.setState({ priceCharges: this.props.adv.priceCharges });
-        this.setState({ priceRent: this.props.adv.priceRent });
+        this.setState({
+            title: this.props.adv.Title,
+            hasWifi: this.props.adv.hasWifi,
+            hasFurnitures: this.props.adv.hasFurnitures,
+            hasCarPark: this.props.adv.hasCarPark,
+            description: this.props.adv.description,
+            priceCharges: this.props.adv.priceCharges,
+            priceRent: this.props.adv.priceRent,
+            cityName: this.props.adv.cityName
+        });
+        //this.setState({ streetName: this.props.adv.address.split(',')[1] });
         console.log(this.props.adv)
     }
 
     componentDidUpdate(nextProps) {
         if (this.props.adv.accomodation_id !== nextProps.adv.accomodation_id) {
-            this.setState({ title: this.props.adv.Title });
-            this.setState({ hasWifi: this.props.adv.hasWifi });
-            this.setState({ hasFurnitures: this.props.adv.hasFurnitures });
-            this.setState({ hasCarPark: this.props.adv.hasCarPark });
-            this.setState({ description: this.props.adv.description });
-            this.setState({ priceCharges: this.props.adv.priceCharges });
-            this.setState({ priceRent: this.props.adv.priceRent });
+            this.setState({
+                title: this.props.adv.Title,
+                hasWifi: this.props.adv.hasWifi,
+                hasFurnitures: this.props.adv.hasFurnitures,
+                hasCarPark: this.props.adv.hasCarPark,
+                description: this.props.adv.description,
+                priceCharges: this.props.adv.priceCharges,
+                priceRent: this.props.adv.priceRent,
+                cityName: this.props.adv.cityName,
+                streetName: this.props.adv.address.split(',')[1],
+                addNumb: this.props.adv.address.split(',')[0].split('/')[0],
+                boxNumb: this.props.adv.address.split(',')[0].split('/')[1],
+            });
             console.log([this.state, this.props.adv])
         }
+    }
+
+    getCities = () => {
+        Axios.get(`${API_URL_CP}/${this.state.query}`)
+            .then(data => {
+                this.setState({
+                    cities: data.data.localites ? data.data.localites : [{ id: 0, nom: 'personne' }]
+                });
+                console.log(data.data.localites)
+            })
+    }
+
+    getStreets = () => {
+        Axios.get(`${API_URL_RUE}/${this.state.cityName}/${this.state.querySt}`)
+            .then(data => {
+                this.setState({
+                    streets: data.data.rues ? data.data.rues : [{ id: 0, nom: 'personne' }]
+                });
+                console.log(data.data.rues)
+            })
+    }
+
+    handleInputChangeCity = (e) => {
+        this.setState({
+            query: e.target.value
+        }, () => {
+            if (this.state.query && this.state.query.length > 1) {
+                if (this.state.query.length % 2 === 0) {
+                    this.getCities()
+                }
+            } else if (!this.state.query) {
+            }
+        });
+    }
+
+    handleInputChangeSt = (e) => {
+        this.setState({
+            querySt: e.target.value
+        }, () => {
+            if (this.state.querySt && this.state.querySt.length > 1) {
+                if (this.state.querySt.length % 2 === 0) {
+                    this.getStreets()
+                }
+            } else if (!this.state.querySt) {
+
+            }
+        });
+        console.log(e.target.value)
     }
 
     updateAccomodation = () => {
@@ -52,6 +121,8 @@ export default class EditAccomodation extends Component {
         data.append('hasFurniture', this.state.hasFurnitures);
         data.append('hasParking', this.state.hasCarPark);
         data.append('description', this.state.description);
+        data.append('cityName', this.state.cityName);
+        data.append('address', this.state.boxNumb ? `${this.state.addNumb}/${this.state.boxNumb},${this.state.streetName}` : `${this.state.addNumb},${this.state.streetName}`);
         fetch(apiUrl + 'updateaccomodation', {
             method: 'post',
             headers: {
@@ -65,9 +136,16 @@ export default class EditAccomodation extends Component {
                     swal(res.response[0]);
                     console.log(res.response)
                 } else {
-                    swal('Logement mis à jour');
-                    this.props.handleClose();
-                    window.location.reload();
+                    swal({
+                        text: 'Logement mis à jour',
+                        icon: 'success',
+                        button: {
+                            closeModal: false,
+                        }
+                    }).then(() => {
+                        this.props.handleClose();
+                        window.location.reload();
+                    });
                 }
             })
     }
@@ -90,9 +168,16 @@ export default class EditAccomodation extends Component {
                         <Form.Group as={Row}>
                             <Form.Label column sm="2">
                                 Titre
-                                </Form.Label>
+                            </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="text" placeholder={adv.title} onChange={e => this.setState({ title: e.target.value })} />
+                                <div id="alert" style={{ color: 'red', fontSize: '0.7rem' }}></div>
+                                <Form.Control type="text" placeholder={adv.title} onChange={e => {
+                                    if (e.target.value.indexOf('"') === -1) {
+                                        this.setState({ title: e.target.value });
+                                        $("#alert").text('');
+                                    }
+                                    else $("#alert").text('Veuillez ne pas insérer de guillemet svp');
+                                }} />
                             </Col>
                         </Form.Group>
 
@@ -169,6 +254,41 @@ export default class EditAccomodation extends Component {
 
                         <Form.Group as={Row}>
                             <Form.Label column sm="2">
+                                Code Postal
+                            </Form.Label>
+                            <Col sm="5">
+                                <Form.Control type="number" min="1000" max="9999" maxLength="4" onChange={this.handleInputChangeCity} />
+                                <CitiesList
+                                    results={this.state.cities}
+                                    choose={e => this.setState({ cityName: e.target.innerText, cities: [] })}
+                                />
+                            </Col>
+                            <Col sm="5">
+                                <Form.Control type="text" placeholder={adv.cityName} disabled />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
+                                Rue
+                            </Form.Label>
+                            <Col xs={6}>
+                                <Form.Control type='text' id='st' placeholder={adv.streetName} onChange={this.handleInputChangeSt} />
+                                <StreetList
+                                    results={this.state.streets}
+                                    choose={e => { this.setState({ streetName: e.target.innerText, streets: [] }); document.getElementById('st').value = e.target.innerText }}
+                                />
+                            </Col>
+                            <Col>
+                                <Form.Control type='number' placeholder={adv.addNumb} min='0' onChange={e => this.setState({ addNumb: e.target.value })} disabled={this.state.cityName === ''} />
+                            </Col>
+                            <Col>
+                                <Form.Control type='number' placeholder={adv.boxNumb ? adv.boxNumb : 'boîte'} min='0' onChange={e => this.setState({ boxNumb: e.target.value })} />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
                                 Description
                             </Form.Label>
                             <Col sm="10">
@@ -187,7 +307,18 @@ export default class EditAccomodation extends Component {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={() => this.updateAccomodation()}>Modifier</Button>
+                    <Button variant="success" onClick={() => {
+                        if($("#alert").text() === '') {
+                            this.updateAccomodation();
+                        }
+                        else swal({
+                            text: 'Il y a des guillemets dans le titre, veuillez les retirer svp',
+                            icon: 'warning'
+                        })                        
+                    }}
+                    >
+                        Modifier
+                    </Button>
                 </Modal.Footer>
             </Modal>
         )
