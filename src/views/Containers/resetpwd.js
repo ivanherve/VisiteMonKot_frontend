@@ -34,8 +34,16 @@ export default class ResetPwd extends Component {
                     swal(res.response);
                     console.log(res.response)
                 } else {
-                    swal(res.response);
-                    window.location.href = '/'
+                    swal({
+                        text: res.response,
+                        icon: 'success',
+                        button: {
+                            closeModal: false,
+                        }
+                    })
+                        .then(() => {
+                            window.location.href = '/'
+                        });
                 }
             })
             .catch(e => console.log(e))
