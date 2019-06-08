@@ -27,11 +27,18 @@ export default class RentAccomodation extends Component {
             if(res.status === 'error'){
                 swal(res.response[0]);
                 console.log(res.response)
-            } else {
-                swal('Ce logement est loué');
-                this.setState({status: 1});
-                this.props.onHide();
-                window.location.reload();
+            } else {                
+                swal({
+                    text: 'Ce logement est loué',
+                    icon: 'success',
+                    button: {
+                        closeModal: false,
+                    }
+                }).then(() => {
+                    this.setState({status: 1});
+                    this.props.onHide();
+                    window.location.reload();
+                });
             }
         })
     }
