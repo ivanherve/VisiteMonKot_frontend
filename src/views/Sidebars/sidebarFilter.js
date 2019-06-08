@@ -7,7 +7,7 @@ export default class SideBarFilter extends Component {
             <nav className="sidebar-wrapper">
                 <div className="sidebar-content" style={{ maxWidth: '200px', overflow: 'auto' }}>
                     <Card>
-                        <article class="card-group-item">
+                        <article className="card-group-item">
                             <Card.Header>
                                 <Card.Title>
                                     <h6>Filtrer</h6>
@@ -61,7 +61,7 @@ export default class SideBarFilter extends Component {
                                 </Card.Body>
                             </div>
                         </article>
-                        <article class="card-group-item">
+                        <article className="card-group-item">
                             <Card.Header>
                                 <Card.Title>
                                     <h6>Prix</h6>
@@ -84,7 +84,7 @@ export default class SideBarFilter extends Component {
                                 </Card.Body>
                             </div>
                         </article>
-                        <article class="card-group-item">
+                        <article className="card-group-item">
                             <Card.Header>
                                 <Card.Title>
                                     <h6>Type</h6>
@@ -105,6 +105,7 @@ export default class SideBarFilter extends Component {
                                         {/**/
                                             this.props.types.map(type =>
                                                 <Form.Check
+                                                    key={this.props.types.indexOf(type)}
                                                     custom
                                                     type="radio"
                                                     label={type.type}
@@ -118,7 +119,7 @@ export default class SideBarFilter extends Component {
                                 </Card.Body>
                             </div>
                         </article>
-                        <article class="card-group-item">
+                        <article className="card-group-item">
                             <Card.Header>
                                 <Card.Title>
                                     <h6>Caractéristique</h6>
