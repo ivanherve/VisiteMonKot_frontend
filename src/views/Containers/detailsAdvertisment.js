@@ -8,6 +8,8 @@ import EditAccomodation from '../Modals/editAccomodation';
 import FreeAccomodation from '../Modals/freeAccomodation';
 import RentAccomodation from '../Modals/rentAccomodation';
 import VisitorsList from '../Modals/visitorsList';
+import DatesVisit from '../Modals/datesVisit';
+import swal from 'sweetalert';
 
 export default class DetailsAdvertisment extends Component {
     constructor() {
@@ -17,7 +19,9 @@ export default class DetailsAdvertisment extends Component {
             showRent: false,
             showFree: false,
             showVisitors: false,
+            showDatesV: false,
             visitors: [],
+            datesVisit: [],
         }
     }
 
@@ -40,15 +44,33 @@ export default class DetailsAdvertisment extends Component {
             })
     }
 
+    fetchVisitDate = (id) => {
+        fetch(`${apiUrl}getvisitdates/${id}`, {
+            method: 'get',
+            headers: {
+                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+            }
+        })
+            .then(response => response.json())
+            .then(res => {
+                console.log(Object.values(res.response));
+                if (res.status === 'error') {
+                    swal(res.response)
+                } else {
+                    this.setState({ datesVisit: Object.values(res.response) });
+                }
+            })
+    }
+
     componentDidMount() {
         console.log(this.props.advertisment);
-
     }
 
     componentDidUpdate(nextProps) {
-        console.log(this.props.advertisment, [nextProps]);
+        console.log([this.props.advertisment, nextProps, this.state.datesVisit]);
         if (this.props.advertisment.accomodation_id !== nextProps.advertisment.accomodation_id) {
             this.getVisitors(this.props.advertisment.accomodation_id);
+            this.fetchVisitDate(this.props.advertisment.accomodation_id);
         }
     }
 
@@ -76,11 +98,18 @@ export default class DetailsAdvertisment extends Component {
                                     </Button>
                             }
                             <Button
-                                style={{ width: '100%' }}
+                                style={{ width: '100%', margin: '10px 0 10px 0' }}
                                 onClick={() => this.setState({ showVisitors: true })}
                                 variant='outline-primary'
                             >
                                 Visite à venir
+                            </Button>
+                            <Button
+                                style={{ width: '100%', margin: '10px 0 10px 0' }}
+                                variant='outline-danger'
+                                onClick={() => this.setState({ showDatesV: true })}
+                            >
+                                Dates de visite
                             </Button>
                         </Col>
                     </Row>
@@ -101,6 +130,7 @@ export default class DetailsAdvertisment extends Component {
                 <RentAccomodation showModal={this.state.showRent} onHide={handleClose} accId={adv.accomodation_id} />
                 <FreeAccomodation showModal={this.state.showFree} onHide={handleClose} accId={adv.accomodation_id} />
                 <VisitorsList showModal={this.state.showVisitors} onHide={handleClose} visitors={this.state.visitors} />
+                <DatesVisit show={this.state.showDatesV} hide={() => this.setState({ showDatesV: false })} dates={this.state.datesVisit} />
             </Card>
         )
     }
