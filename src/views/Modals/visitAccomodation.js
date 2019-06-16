@@ -17,7 +17,7 @@ export default class VisitAccomodation extends Component {
 
     componentDidUpdate(nextProps, nextState) {
         if (this.props.datesVisit !== nextProps.datesVisit)
-            this.setState({ datesVisit: this.props.datesVisit });
+            this.setState({ datesVisit: this.props.datesVisit, dateVisit: this.props.datesVisit[0].start_date });
         console.log(this.props.datesVisit, this.state.datesVisit);
     }
 
@@ -93,7 +93,7 @@ export default class VisitAccomodation extends Component {
                                         datesVisit.map(d =>
                                             d.start_date === d.end_date
                                                 ?
-                                                <OverlayTrigger key={datesVisit.indexOf(d)} trigger="click" placement="right" overlay={<Popover title='A quelle heure ?'><ChooseADate min={d.start_time.slice(0, 5)} max={d.end_time.slice(0, 5)} click={() => this.visitAccomodation(d.iddate_visit, $('#date').val(), $('#time1').val())} /></Popover>}>
+                                                <OverlayTrigger key={datesVisit.indexOf(d)} trigger="click" placement="right" overlay={<Popover title='A quelle heure ?'><ChooseADate min={d.start_time.slice(0, 5)} max={d.end_time.slice(0, 5)} click={() => this.visitAccomodation(d.iddate_visit, d.start_date, $('#time1').val())} /></Popover>}>
                                                     <ListGroup.Item action disabled={d.start_date < moment().format().slice(0, 10)} variant='info' onClick={() => console.log(d.iddate_visit)}>
                                                         Le <strong>{moment(d.start_date).format('LL')}</strong> de <u><i>{d.start_time.slice(0, 5)}</i></u> à <u><i>{d.end_time.slice(0, 5)}</i></u>
                                                     </ListGroup.Item>
@@ -113,9 +113,13 @@ export default class VisitAccomodation extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     {
-                        datesVisit.length < 2
+                        datesVisit.length === 1
                             ?
-                            <Button variant='outline-success' onClick={() => this.visitAccomodation(accomo.accomodation_id, this.state.dateVisit, this.state.timeVisit)}>Visiter</Button>
+                            !datesVisit[0].end_date
+                                ?
+                                <Button variant='outline-success' onClick={() => this.visitAccomodation(datesVisit[0].iddate_visit, this.state.dateVisit, this.state.timeVisit)}>Visiter</Button>
+                                :
+                                null
                             :
                             null
                     }
