@@ -454,7 +454,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <br />
                         <Form.Label>De quel type de logement s'agit-il ? *</Form.Label>
-                        <Form.Control as="select" name="Type" required onChange={e => console.log(e.target.value)}>
+                        <Form.Control as="select" name="Type" required onChange={e => { console.log(e.target.value); this.setState({ type: e.target.value }) }}>
                             {
                                 this.state.types.map(type =>
                                     <option key={this.state.types.indexOf(type)}>{type.type}</option>
