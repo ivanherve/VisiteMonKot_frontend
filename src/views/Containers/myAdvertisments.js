@@ -19,6 +19,7 @@ export default class MyAdvertisments extends Component {
       advertisments: [],
       accomodation_id: '',
       oneAd: {},
+      //datesVisit: []
     };
   }
 
@@ -87,7 +88,7 @@ export default class MyAdvertisments extends Component {
                           <Col>
                             <div>visites : {adv.nbVisit}</div>
                             <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>
-                              <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge> 
+                              <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge>
                             </div>
                           </Col>
                         </Row>
@@ -99,6 +100,7 @@ export default class MyAdvertisments extends Component {
               <Col>
                 <DetailsAdvertisment
                   advertisment={this.state.oneAd}
+                  //datesVisit={this.state.datesVisit}
                 />
               </Col>
             </Row>
