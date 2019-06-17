@@ -25,7 +25,7 @@ export default class Profile extends Component {
                                 </Card.Body>
                                 <ListGroup className="list-group-flush">
                                     <Link to={'/profile/'+user.user_id} className="list-group-item">Modifier mes informations personnelles</Link>
-                                    <Link to={'/profile/reset/'+user.user_id} className="list-group-item">Modifier mon mot de passe</Link>
+                                    <Link to={'/profile/resetpwd/'+user.user_id} className="list-group-item">Modifier mon mot de passe</Link>
                                     <ListGroupItem variant="danger" onClick={() => alert('lala')}>
                                         Supprimer mon compte
                                     </ListGroupItem>
@@ -35,7 +35,7 @@ export default class Profile extends Component {
                         <Col xs={9}>
                             <Switch>
                                 <Route path={'/profile/'+user.user_id} render={() => <ProfileDetails user={user} />} />
-                                <Route path={'/profile/reset/'+user.user_id} render={() => <ResetPwd />} />
+                                <Route path={'/profile/resetpwd/'+user.user_id} render={() => <ResetPwd />} />
                                 <Redirect from='/profile' to={'/profile/'+user.user_id} />
                             </Switch>
                         </Col>
