@@ -61,7 +61,9 @@ export default class VisitAccomodation extends Component {
 
     render() {
         let accomo = this.props.accomo;
-        let datesVisit = this.state.datesVisit;
+        let datesVisit = this.state.datesVisit.sort((a,b) => 
+            (a.start_date > b.start_date) ? 1 : ((b.start_date > a.start_date) ? -1 : 0)
+        );
         let today = moment(Date()).format('YYYY-MM-Do');
         return (
             <Modal enforceFocus={false} show={this.props.show} onHide={this.props.hide} size='lg' centered>
