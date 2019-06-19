@@ -70,6 +70,15 @@ class Header extends Component {
                                 <Nav.Item>
                                     <Link className="nav-link" to="/visits">Mes visites</Link>
                                 </Nav.Item>
+                                {
+                                    user.profil_id === 3
+                                        ?
+                                        <Nav.Item>
+                                            <Link className="nav-link" to="/admin">Gestion</Link>
+                                        </Nav.Item>
+                                        :
+                                        null
+                                }
                                 {/*
                                 <Nav.Item>
                                     <Link className="nav-link" to="/test">Test</Link>
@@ -84,7 +93,7 @@ class Header extends Component {
                                 //<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />+
                                 // {Paramètres}
                                 >
-                                    <NavDropdown.Item><Link to={'/profile/reset/'+user.user_id}>Modifier mon mot de passe</Link></NavDropdown.Item>
+                                    <NavDropdown.Item><Link to={'/profile/reset/' + user.user_id}>Modifier mon mot de passe</Link></NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item><Link to="/contact">Contacter l'équipe VisiteMonKot</Link></NavDropdown.Item>
                                 </NavDropdown>

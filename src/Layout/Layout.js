@@ -11,6 +11,7 @@ import Contact from '../views/Containers/contact';
 import Profile from '../views/Containers/profile';
 import { Button } from 'react-bootstrap';
 import { apiUrl } from '../router';
+import Management from '../views/Containers/management';
 
 
 class Layout extends Component {
@@ -35,7 +36,7 @@ class Layout extends Component {
         <Headers onClick={() => this.setState({ redirect: true })} />
         <div style={{ marginTop: '70px', marginBottom: '50px' }}>
           {
-            sessionStorage.getItem('userData') 
+            sessionStorage.getItem('userData')
               ? // If signed In
               <Switch>
                 <Route path='/accomodations' component={AccomodationsList} />
@@ -44,14 +45,21 @@ class Layout extends Component {
                 <Route path='/resetpwd' component={ResetPwd} />
                 <Route path='/contact' component={Contact} />
                 <Route path='/profile' component={Profile} />
-                <Route path='/test' render={() => 
+                {
+                  JSON.parse(sessionStorage.getItem('userData')).user.profil_id === 3
+                    ?
+                    <Route path='/admin' component={Management} />
+                    :
+                    null
+                }
+                <Route path='/test' render={() =>
                   <div>
                     <input type='file' name='files[]' multiple />
                     <Button onClick={() => {
                       let data = new FormData()
-                      fetch(apiUrl+'uploadimages',{
+                      fetch(apiUrl + 'uploadimages', {
                         method: 'post',
-                        headers:{
+                        headers: {
                           api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
                         },
                         body: data,
