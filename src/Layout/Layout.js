@@ -12,6 +12,7 @@ import Profile from '../views/Containers/profile';
 import { Button } from 'react-bootstrap';
 import { apiUrl } from '../router';
 import Management from '../views/Containers/management';
+import Test from '../views/Containers/testview';
 
 
 class Layout extends Component {
@@ -52,21 +53,13 @@ class Layout extends Component {
                     :
                     null
                 }
-                <Route path='/test' render={() =>
-                  <div>
-                    <input type='file' name='files[]' multiple />
-                    <Button onClick={() => {
-                      let data = new FormData()
-                      fetch(apiUrl + 'uploadimages', {
-                        method: 'post',
-                        headers: {
-                          api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
-                        },
-                        body: data,
-                      }).then(response => response.json()).then(res => console.log(res))
-                    }}>send</Button>
-                  </div>
-                } />
+                {
+                  JSON.parse(sessionStorage.getItem('userData')).user.profil_id === 5
+                    ?
+                    <Route path='/test' component={Test} />
+                    :
+                    null
+                }
                 <Redirect from="/" to="/accomodations" />
               </Switch>
               : // If signed Out

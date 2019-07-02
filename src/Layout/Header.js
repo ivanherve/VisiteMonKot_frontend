@@ -79,10 +79,14 @@ class Header extends Component {
                                         :
                                         null
                                 }
-                                {/*
-                                <Nav.Item>
-                                    <Link className="nav-link" to="/test">Test</Link>
-                                </Nav.Item>*/
+                                {/**/
+                                    user.profil_id === 5
+                                        ?
+                                        <Nav.Item>
+                                            <Link className="nav-link" to="/test">Test</Link>
+                                        </Nav.Item>
+                                        :
+                                        null
                                 }
                             </Nav>
                             <Nav>
