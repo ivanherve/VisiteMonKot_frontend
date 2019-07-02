@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Button, Form, Row, Col, Card, ListGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Card, ListGroup, OverlayTrigger, Tooltip, Image } from 'react-bootstrap';
 
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
@@ -12,6 +12,8 @@ import CitiesList from '../Containers/CitiesList';
 import StreetList from '../Containers/StreetList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import swal from 'sweetalert';
+
+import FileBase64 from 'react-file-base64';
 
 export default class AddAnnounce extends Component {
     constructor(props) {
@@ -41,7 +43,7 @@ export default class AddAnnounce extends Component {
             streetName: '',
             type: '',
             surface: '',
-            pictures: null,
+            pictures: [],
             addressVisible: 0,
             typeDate: 0,
             datesVisits: [],
@@ -64,6 +66,12 @@ export default class AddAnnounce extends Component {
                     this.setState({ type: res.response[0].type })
                 }
             })
+    }
+
+    // Callback~
+    getFiles(pictures) {
+        this.setState({ pictures });
+        console.log(pictures)
     }
 
     getCities = () => {
@@ -115,7 +123,31 @@ export default class AddAnnounce extends Component {
         console.log(e.target.value)
     }
 
+    sendImages = (files) => {
+        files.map(file => {
+            //b64.push(file.base64)
+            let data = new FormData();
+            data.append('image', file.base64);
+            data.append('aid', 1)
+            fetch(`${apiUrl}uploadimages`, {
+                method: 'post',
+                headers: {
+                    api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                },
+                body: data
+            }).then(response => response.json())
+                .then(res => {
+                    if (res.status === 'error') console.log(res.response);
+                    else console.log(res);
+                })
+        })
+    }
+
     addOneAnnounce = () => {
+        let imgb64 = [];
+        this.state.pictures.map(pic => {
+            imgb64.push(pic.base64)
+        })
         let data = new FormData();
         data.append('title', this.state.title);
         data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
@@ -135,7 +167,7 @@ export default class AddAnnounce extends Component {
         data.append('addressVisible', this.state.addressVisible);
         data.append('typeDate', this.state.typeDate.toString());
         //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
-        //data.append('image', this.state.pictures);
+        data.append('image', JSON.stringify(imgb64));
         Axios({
             url: apiUrl + 'addadvertisments',
             method: 'post',
@@ -463,7 +495,33 @@ export default class AddAnnounce extends Component {
                         </Form.Control>
                         <br />
                         <Form.Label>Ajoutez quelques Photos *</Form.Label>
-                        <input className="form-control" type="file" name="Pictures" onChange={e => this.setState({ pictures: e.target.files[0] })} required multiple />
+                        <br />
+                        <Card>
+                            <Card.Body>
+                                <FileBase64
+                                    className='form-control-file'
+                                    multiple={true}
+                                    onDone={pictures => this.setState({ pictures })}
+                                />
+                                <Row>
+                                    {
+                                        this.state.pictures.length > 0
+                                            ?
+                                            this.state.pictures.map(img =>
+                                                <div key={this.state.pictures.indexOf(img)} style={styles.thumbsContainer}>
+                                                    <div style={styles.thumb}>
+                                                        <div style={styles.thumbInner}>
+                                                            <Image src={img.base64} style={styles.img} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                            :
+                                            null
+                                    }
+                                </Row>
+                            </Card.Body>
+                        </Card>
                         <br />
                     </Form>
                 </Modal.Body>
@@ -481,5 +539,35 @@ export default class AddAnnounce extends Component {
                 </Modal.Footer>
             </Modal>
         )
+    }
+}
+
+const styles = {
+    thumbsContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 16
+    },
+    thumb: {
+        display: 'inline-flex',
+        borderRadius: 2,
+        border: '1px solid #eaeaea',
+        marginBottom: 8,
+        marginRight: 8,
+        width: 100,
+        height: 100,
+        padding: 4,
+        boxSizing: 'border-box'
+    },
+    thumbInner: {
+        display: 'flex',
+        minWidth: 0,
+        overflow: 'hidden'
+    },
+    img: {
+        display: 'block',
+        width: 'auto',
+        height: '100%'
     }
 }
