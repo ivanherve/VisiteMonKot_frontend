@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip, Badge, Popover } from 'react-bootstrap';
+import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip, Badge, Popover, Card } from 'react-bootstrap';
 import StickyBox from "react-sticky-box";
 import '../../App.css';
 import bedroom from '../../Pictures/bedroom-ex.jpg';
@@ -13,6 +13,7 @@ import VisitAccomodation from '../Modals/visitAccomodation';
 import SideBarFilter from '../Sidebars/sidebarFilter';
 import swal from 'sweetalert';
 import InfiniteScroll from 'react-infinite-scroller';
+import Pictures from '../Modals/Pictures';
 
 
 export default class AccomodationsList extends Component {
@@ -37,6 +38,8 @@ export default class AccomodationsList extends Component {
       targetAcc: {},
       datesVisit: [],
       hasMoreAccomo: true,
+      showPictures: false,
+      firstPic: '../../logo/vmk_v5.ico',
     }
   }
 
@@ -65,7 +68,7 @@ export default class AccomodationsList extends Component {
         } else {
           if (res.response.length === qty) {
             this.setState({ accomodations: res.response, hasMoreAccomo: true });
-            console.log([res.response.length , qty])
+            console.log([res.response.length, qty])
           } else this.setState({ hasMoreAccomo: false });
           res.response.map(el =>
             arr.push(el.priceCharges + el.priceRent)
@@ -217,11 +220,13 @@ export default class AccomodationsList extends Component {
                   {
                     SortedFromNewest.map(accomo =>
                       <div key={SortedFromNewest.indexOf(accomo)}>
-                        <AccomodationItem
+                        <AccItem
                           accomo={accomo}
                           variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
                           showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); this.fetchVisitDate(accomo.accomodation_id); console.log(accomo) }}
                           disabled={accomo.isStillFree === 0}
+                          cardStyle={styles.zoom}
+                          showPictures={(e) => this.setState({ showPictures: true, firstPic: e.target.src, targetAcc: accomo })}
                         />
                       </div>
                     )
@@ -241,112 +246,156 @@ export default class AccomodationsList extends Component {
             accomo={this.state.targetAcc}
             datesVisit={this.state.datesVisit}
           />
+          <Pictures
+            show={this.state.showPictures}
+            hide={() => this.setState({ showPictures: false })}
+            title={this.state.targetAcc.Title}
+            img={this.state.targetAcc.pictures ? this.state.targetAcc.pictures : [this.state.firstPic]}
+            description={this.state.targetAcc.Description}
+          />
         </Container>
       </Row>
     );
   }
 }
 
-const AccomodationItem = ({ accomo, key, variant, showToVisit }) => {
-  let img;
-  switch (accomo.type) {
-    case 'Maison': img = house;
-      break;
-    case 'Appartement': img = building;
-      break;
-    case 'Kot': img = house;
-      break;
-    case 'Communautaire': img = house;
-      break;
-    case 'Duplex': img = house;
-      break;
-    case 'Studio': img = bedroom;
-      break;
-    case 'Garage': img = garage;
-      break;
-    default: img = house;
+class AccItem extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isHovered: false,
+    }
   }
-  return (
-    <ListGroup.Item key={key} variant={variant} >
-      <Row>
-        <Col xs={3}>
-          <Image src={img} rounded />
-          <div style={{ display: 'flex', justifyContent: 'center', fontSize: '1.5rem' }}>{accomo.type}</div>
-        </Col>
-        <Col md={{ offset: 1 }}>
-          <Row>
-            <Col xs={10}>
-              <h3>{accomo.Title}</h3>
-              <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
-              <p>{accomo.addressVisible === 1 ? 'Adresse: ' + accomo.address + ', ' + accomo.cityName : null}</p>
-              <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
-                <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
+
+  componentDidMount() {
+    console.log(this.props)
+  }
+
+  render() {
+    let accomo = this.props.accomo;
+    let key = this.props.key;
+    let variant = this.props.variant;
+    let showToVisit = this.props.showToVisit;
+    let cardStyle = this.props.cardStyle;
+    let isHovered = this.state.isHovered;
+    let showPictures = this.props.showPictures;
+
+    let img;
+    let pic = accomo.pictures;
+    switch (accomo.type) {
+      case 'Maison': img = house;
+        break;
+      case 'Appartement': img = building;
+        break;
+      case 'Kot': img = house;
+        break;
+      case 'Communautaire': img = house;
+        break;
+      case 'Duplex': img = house;
+        break;
+      case 'Studio': img = bedroom;
+        break;
+      case 'Garage': img = garage;
+        break;
+      default: img = house;
+    }
+
+    if (!pic) {
+      pic = img;
+    }
+
+    return (
+      <ListGroup.Item key={key} variant={variant} >
+        <Row>
+          <Col xs={3}>
+            <Card
+              onClick={pic === accomo.pictures ? (e) => showPictures(e) : null}
+              onMouseOver={pic === accomo.pictures ? () => this.setState({ isHovered: true }) : null}
+              onMouseOut={pic === accomo.pictures ? () => this.setState({ isHovered: false }) : null}
+              style={pic === accomo.pictures ? isHovered ? cardStyle : null : null}
+            >
+              <Card.Img variant="top" src={pic === accomo.pictures ? pic[0].picture : pic} />
+              <Card.Footer>
+                <div style={{ display: 'flex', justifyContent: 'center', fontSize: '1.5rem' }}>{accomo.type}</div>
+              </Card.Footer>
+            </Card>
+          </Col>
+          <Col md={{ offset: 1 }}>
+            <Row>
+              <Col xs={10}>
+                <h3>{accomo.Title}</h3>
+                <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
+                <p>{accomo.addressVisible === 1 ? 'Adresse: ' + accomo.address + ', ' + accomo.cityName : null}</p>
+                <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
+                  <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
               </p>
-            </Col>
-            {
-              sessionStorage.getItem('userData')
-                ?
-                <Col xs={2}>
-                  <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
-                    Visiter ?
+              </Col>
+              {
+                sessionStorage.getItem('userData')
+                  ?
+                  <Col xs={2}>
+                    <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
+                      Visiter ?
                   </Button>
-                </Col>
-                :
-                <Col>
-                  <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Connectez-vous d'abord</Tooltip>}>
-                    <span className="d-inline-block">
-                      <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter ?</Button>
-                    </span>
-                  </OverlayTrigger>
-                </Col>
-            }
+                  </Col>
+                  :
+                  <Col>
+                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Connectez-vous d'abord</Tooltip>}>
+                      <span className="d-inline-block">
+                        <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter ?</Button>
+                      </span>
+                    </OverlayTrigger>
+                  </Col>
+              }
 
-          </Row>
+            </Row>
 
-          <Row>
-            <Col xs={2}>{accomo.nbVisit} visites</Col>
-            <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom} chambres</Col>
-            {
-              accomo.HasWifi === 1
-                ?
-                <Col xs={2}><FontAwesomeIcon icon={["fas", "wifi"]} /> WiFi</Col>
-                :
-                null
-            }
-            {
-              accomo.HasCarPark === 1
-                ?
-                <Col xs={2}><FontAwesomeIcon icon={["fas", "car"]} /> Parking</Col>
-                :
-                null
-            }
-            {
-              accomo.HasFurnitures === 1
-                ?
-                <Col xs={2}>
-                  <OverlayTrigger overlay={
-                    <Popover title='Meubles'>
-                      <ListGroup>
-                        <ListGroup.Item>Lit</ListGroup.Item>
-                        <ListGroup.Item>Armoire</ListGroup.Item>
-                        <ListGroup.Item>Table</ListGroup.Item>
-                      </ListGroup>
-                    </Popover>
-                  }>
-                    <Badge variant='outline-dark'>Meublé</Badge>
-                  </OverlayTrigger>
-                </Col>
-                :
-                null
-            }
-            <Col xs={2}>{accomo.Surface} m<sup>2</sup></Col>
-          </Row>
-          <h5 style={{ marginTop: '10px', fontStyle: 'italic' }}>Annonce de : {accomo.Firstname} {accomo.Surname}</h5>
-          <p style={{ fontSize: '0.8rem', marginTop: '10px', fontStyle: 'italic' }}>{accomo.Description}</p>
-        </Col>
-      </Row>
-    </ListGroup.Item>
-  )
+            <Row>
+              <Col xs={2}>{accomo.nbVisit} visites</Col>
+              <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom} chambres</Col>
+              {
+                accomo.HasWifi === 1
+                  ?
+                  <Col xs={2}><FontAwesomeIcon icon={["fas", "wifi"]} /> WiFi</Col>
+                  :
+                  null
+              }
+              {
+                accomo.HasCarPark === 1
+                  ?
+                  <Col xs={2}><FontAwesomeIcon icon={["fas", "car"]} /> Parking</Col>
+                  :
+                  null
+              }
+              {
+                accomo.HasFurnitures === 1
+                  ?
+                  <Col xs={2}>
+                    <OverlayTrigger overlay={
+                      <Popover title='Meubles'>
+                        <ListGroup>
+                          <ListGroup.Item>Lit</ListGroup.Item>
+                          <ListGroup.Item>Armoire</ListGroup.Item>
+                          <ListGroup.Item>Table</ListGroup.Item>
+                        </ListGroup>
+                      </Popover>
+                    }>
+                      <Badge variant='outline-dark'>Meublé</Badge>
+                    </OverlayTrigger>
+                  </Col>
+                  :
+                  null
+              }
+              <Col xs={2}>{accomo.Surface} m<sup>2</sup></Col>
+            </Row>
+            <h5 style={{ marginTop: '10px', fontStyle: 'italic' }}>Annonce de : {accomo.Firstname} {accomo.Surname}</h5>
+            <p style={{ fontSize: '0.8rem', marginTop: '10px', fontStyle: 'italic' }}>{accomo.Description}</p>
+          </Col>
+        </Row>
+      </ListGroup.Item>
+    )
+  }
 }
 
 const styles = {
@@ -365,5 +414,36 @@ const styles = {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
+  },
+  thumbsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 16
+  },
+  thumb: {
+    display: 'inline-flex',
+    borderRadius: 2,
+    border: '1px solid #eaeaea',
+    marginBottom: 8,
+    marginRight: 8,
+    width: 100,
+    height: 100,
+    padding: 4,
+    boxSizing: 'border-box'
+  },
+  thumbInner: {
+    display: 'flex',
+    minWidth: 0,
+    overflow: 'hidden'
+  },
+  img: {
+    display: 'block',
+    width: 'auto',
+    height: '100%'
+  },
+  zoom: {
+    transform: 'scale(1.1)',
+    transition: 'transform .2s', /* Animation */
+    cursor: 'pointer'
   }
 }
