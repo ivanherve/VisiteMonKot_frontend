@@ -75,12 +75,15 @@ export default class AddAnnounce extends Component {
     }
 
     getCities = () => {
-        Axios.get(`${API_URL_CP}/${this.state.query}`)
+        fetch(`${API_URL_CP}/${this.state.query}`, {
+            method: 'get'
+        })
+            .then(response => response.json())
             .then(data => {
                 this.setState({
-                    cities: data.data.localites ? data.data.localites : [{ id: 0, nom: 'personne' }]
+                    cities: data.localites ? data.localites : [{ id: 0, nom: 'personne' }]
                 });
-                console.log(data.data.localites)
+                console.log(data.localites)
             })
     }
 
@@ -99,12 +102,15 @@ export default class AddAnnounce extends Component {
     }
 
     getStreets = () => {
-        Axios.get(`${API_URL_RUE}/${this.state.cityName}/${this.state.querySt}`)
+        fetch(`${API_URL_RUE}/${this.state.cityName}/${this.state.querySt}`, {
+            method: 'get'
+        })
+            .then(response => response.json())
             .then(data => {
                 this.setState({
-                    streets: data.data.rues ? data.data.rues : [{ id: 0, nom: 'personne' }]
+                    streets: data.rues ? data.rues : [{ id: 0, nom: 'personne' }]
                 });
-                console.log(data.data.rues)
+                console.log(data.rues)
             })
     }
 
@@ -132,7 +138,7 @@ export default class AddAnnounce extends Component {
             fetch(`${apiUrl}uploadimages`, {
                 method: 'post',
                 headers: {
-                    api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                    'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
                 },
                 body: data
             }).then(response => response.json())
@@ -147,7 +153,7 @@ export default class AddAnnounce extends Component {
         let imgb64 = [];
         this.state.pictures.map(pic => {
             imgb64.push(pic.base64)
-        })
+        });        
         let data = new FormData();
         data.append('title', this.state.title);
         data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
@@ -167,21 +173,18 @@ export default class AddAnnounce extends Component {
         data.append('addressVisible', this.state.addressVisible);
         data.append('typeDate', this.state.typeDate.toString());
         //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
-        data.append('image', JSON.stringify(imgb64));
-        Axios({
-            url: apiUrl + 'addadvertisments',
+        data.append('image', JSON.stringify(imgb64));        
+        fetch(apiUrl + 'addadvertisments', {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                //'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
-            data: data
+            body: data
         })
-            //.then(response => response.json())
+            .then(response => response.json())
             .then(res => {
-                if (res.status === 'error') {
-                    swal(res.response[0]);
-                    console.log(res.response)
-                } else {
+                if (res.status === 'success') {
                     swal({
                         title: 'Parfait!',
                         text: `Annonce ajouté`,
@@ -194,6 +197,9 @@ export default class AddAnnounce extends Component {
                             this.props.handleClose();
                             window.location.reload();
                         });
+                } else {
+                    swal(res.response[0]);
+                    console.log(res.response)
                 }
             }, err => { swal(err); console.log(this.state.pictures) })
     }
@@ -224,7 +230,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Form.Control placeholder="Charges €*" name="priceCharges" min="0" type="number" required onChange={e => this.setState({ priceCharges: e.target.value })} />
                         <br />
-                        <Form.Label>Durée de bail *</Form.Label>
+                        <Form.Label>Durée de sous-location *</Form.Label>
                         <br />
                         <DateRangePicker
                             startDateId="beginingTime"
@@ -441,7 +447,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Row>
                             <Col>
-                                <Form.Control type='number' min='1000' placeholder="Code Postal ? *" required onChange={this.handleInputChangeCity} />
+                                <Form.Control type='number' min='1000' placeholder="Code Postal *" required onChange={this.handleInputChangeCity} />
                                 <CitiesList
                                     results={this.state.cities}
                                     choose={e => this.setState({ cityName: e.target.innerText, cities: [] })}
@@ -454,7 +460,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Row>
                             <Col xs={8}>
-                                <Form.Control type='text' id='st' disabled={this.state.cityName.length < 1} placeholder="Dans quelle rue ? *" onChange={this.handleInputChangeSt} />
+                                <Form.Control type='text' id='st' disabled={this.state.cityName.length < 1} placeholder="Rue *" onChange={this.handleInputChangeSt} />
                                 <StreetList
                                     results={this.state.streets}
                                     choose={e => { this.setState({ streetName: e.target.innerText, streets: [] }); document.getElementById('st').value = e.target.innerText }}
