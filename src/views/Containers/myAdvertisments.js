@@ -6,6 +6,7 @@ import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import { apiUrl } from '../../router';
 import AddAnnounce from '../Modals/addAnnounce';
 import DetailsAdvertisment from './detailsAdvertisment';
+import LoadingComponent from './LoadingComponent';
 
 export default class MyAdvertisments extends Component {
   constructor(props, context) {
@@ -19,6 +20,7 @@ export default class MyAdvertisments extends Component {
       advertisments: [],
       accomodation_id: '',
       oneAd: {},
+      loading: null,
       //datesVisit: []
     };
   }
@@ -35,7 +37,7 @@ export default class MyAdvertisments extends Component {
     fetch(apiUrl + 'advertisments', {
       method: 'GET',
       headers: {
-        api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+        'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
       }
     })
       .then(response => response.json())
@@ -58,58 +60,81 @@ export default class MyAdvertisments extends Component {
 
   componentDidMount() {
     this.getAdvertisment();
-  }
+  }  
 
   render() {
+    let profil = JSON.parse(sessionStorage.getItem('userData')).user.profil_id;
+    setTimeout(() => this.setState({ loading: 1 }), 5000);
     return (
       <Container>
         <h1>Annonces</h1>
-        <Button style={{ width: '100%', margin: '10px 0 10px 0' }} variant="outline-success" onClick={this.handleShow}><FontAwesomeIcon icon={["fas", "plus"]} /> Annoncer un logement</Button>
-        <AddAnnounce
-          showModal={this.state.showModal}
-          handleClose={this.handleClose}
-        />
         {
-          this.state.isThereAccomo
+          !this.state.loading
             ?
-            <Row>
-              <Col xs={5}>
-                <ListGroup>
-                  {
-                    this.state.advertisments.map(adv =>
-                      <ListGroup.Item
-                        action
-                        onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}
-                        key={adv.accomodation_id}
-                        variant={adv.nbVisit > 0 ? "warning" : "success"}
-                      >
-                        <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
-                        <Row>
-                          <Col>
-                            <div>visites : {adv.nbVisit}</div>
-                            <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>
-                              <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge>
-                            </div>
-                          </Col>
-                        </Row>
-                      </ListGroup.Item>
-                    )
-                  }
-                </ListGroup>
-              </Col>
-              <Col>
-                <DetailsAdvertisment
-                  advertisment={this.state.oneAd}
-                  //datesVisit={this.state.datesVisit}
-                />
-              </Col>
-            </Row>
-
+            <LoadingComponent />
             :
-            <div style={styles.image}>
-              <div style={styles.emptyList}>
-                Vous n'avez annoncé aucun logement
+            <div>
+              <Button
+                disabled={profil === 1}
+                style={{ width: '100%', margin: '10px 0 10px 0' }}
+                variant="outline-success"
+                onClick={this.handleShow}>
+                {
+                  profil === 1 ?
+                    <div>Activer votre compte pour pouvoir annoncer des logements</div>
+                    :
+                    <div>
+                      <FontAwesomeIcon icon={["fas", "plus"]} /> Annoncer un logement
               </div>
+                }
+              </Button>
+              <AddAnnounce
+                showModal={this.state.showModal}
+                handleClose={this.handleClose}
+              />
+              {
+                this.state.isThereAccomo
+                  ?
+                  <Row>
+                    <Col xs={5}>
+                      <ListGroup>
+                        {
+                          this.state.advertisments.map(adv =>
+                            <ListGroup.Item
+                              action
+                              onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}
+                              key={adv.accomodation_id}
+                              variant={adv.nbVisit > 0 ? "warning" : "success"}
+                            >
+                              <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
+                              <Row>
+                                <Col>
+                                  <div>visites : {adv.nbVisit}</div>
+                                  <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>
+                                    <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge>
+                                  </div>
+                                </Col>
+                              </Row>
+                            </ListGroup.Item>
+                          )
+                        }
+                      </ListGroup>
+                    </Col>
+                    <Col>
+                      <DetailsAdvertisment
+                        advertisment={this.state.oneAd}
+                      //datesVisit={this.state.datesVisit}
+                      />
+                    </Col>
+                  </Row>
+
+                  :
+                  <div style={styles.image}>
+                    <div style={styles.emptyList}>
+                      Vous n'avez annoncé aucun logement
+              </div>
+                  </div>
+              }
             </div>
         }
       </Container>

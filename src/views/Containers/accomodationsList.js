@@ -14,6 +14,7 @@ import SideBarFilter from '../Sidebars/sidebarFilter';
 import swal from 'sweetalert';
 import InfiniteScroll from 'react-infinite-scroller';
 import Pictures from '../Modals/Pictures';
+import LoadingComponent from './LoadingComponent';
 
 
 export default class AccomodationsList extends Component {
@@ -40,6 +41,7 @@ export default class AccomodationsList extends Component {
       hasMoreAccomo: true,
       showPictures: false,
       firstPic: '../../logo/vmk_v5.ico',
+      loading: null,
     }
   }
 
@@ -85,7 +87,7 @@ export default class AccomodationsList extends Component {
     fetch(`${apiUrl}getvisitdates/${id}`, {
       method: 'get',
       headers: {
-        api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+        'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
       }
     })
       .then(response => response.json())
@@ -176,6 +178,8 @@ export default class AccomodationsList extends Component {
     ) : this.state.isSortedFromCheapest ? items.sort(
       (a, b) => ((a.priceRent + a.priceCharges) > (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) > (a.priceRent + a.priceCharges)) ? -1 : 0)
     ) : items;
+    setTimeout(() => this.setState({ loading: 1 }), 5000);
+    //if (!this.state.loading) return <div style={{ display: 'flex', justifyContent: 'center' }}></div>
     return (
       <Row>
         <div style={{ marginTop: '10px', marginLeft: '10px' }}>
@@ -196,64 +200,69 @@ export default class AccomodationsList extends Component {
             />
           </StickyBox>
         </div>
-        <Container>
-          <h1>Logements</h1>
-          <FormControl
-            type="text"
-            placeholder="Rechercher un nom de logement"
-            style={{ width: '100%', marginBottom: '10px' }}
-            className="mr-sm-4"
-            onChange={e => this.setState({ query: e.target.value })}
-          />
-
-
-          <ListGroup variant='flush'>
-            {
-              SortedFromNewest.length > 0
-                ?
-                <InfiniteScroll
-                  pageStart={10}
-                  loadMore={this.fetchAccomodations.bind(this)}
-                  hasMore={this.state.hasMoreAccomo}
-                  loader={<div className="loader">Loading ...</div>}
-                >
-                  {
-                    SortedFromNewest.map(accomo =>
-                      <div key={SortedFromNewest.indexOf(accomo)}>
-                        <AccItem
-                          accomo={accomo}
-                          variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
-                          showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); this.fetchVisitDate(accomo.accomodation_id); console.log(accomo) }}
-                          disabled={accomo.isStillFree === 0}
-                          cardStyle={styles.zoom}
-                          showPictures={(e) => this.setState({ showPictures: true, firstPic: e.target.src, targetAcc: accomo })}
-                        />
+        {
+          !this.state.loading
+            ?
+            <LoadingComponent />
+            :
+            <Container>
+              <h1>Logements</h1>
+              <FormControl
+                type="text"
+                placeholder="Rechercher un nom de logement"
+                style={{ width: '100%', marginBottom: '10px' }}
+                className="mr-sm-4"
+                onChange={e => this.setState({ query: e.target.value })}
+              />
+              <ListGroup variant='flush'>
+                {
+                  SortedFromNewest.length > 0
+                    ?
+                    <InfiniteScroll
+                      pageStart={10}
+                      loadMore={this.fetchAccomodations.bind(this)}
+                      hasMore={this.state.hasMoreAccomo}
+                      loader={<div className="loader">Loading ...</div>}
+                    >
+                      {
+                        SortedFromNewest.map(accomo =>
+                          <div key={SortedFromNewest.indexOf(accomo)}>
+                            <AccItem
+                              accomo={accomo}
+                              variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
+                              showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); this.fetchVisitDate(accomo.accomodation_id); console.log(accomo) }}
+                              disabled={accomo.isStillFree === 0}
+                              cardStyle={styles.zoom}
+                              showPictures={(e) => this.setState({ showPictures: true, firstPic: e.target.src, targetAcc: accomo })}
+                            />
+                          </div>
+                        )
+                      }
+                    </InfiniteScroll>
+                    :
+                    <div style={styles.image}>
+                      <div style={styles.emptyList}>
+                        Aucun logement ne correspond à votre recherche
                       </div>
-                    )
-                  }
-                </InfiniteScroll>
-                :
-                <div style={styles.image}>
-                  <div style={styles.emptyList}>
-                    Aucun logement ne correspond à votre recherche
-                  </div>
-                </div>
-            }
-          </ListGroup>
-          <VisitAccomodation
-            show={this.state.showToVisit}
-            hide={() => this.setState({ showToVisit: false })}
-            accomo={this.state.targetAcc}
-            datesVisit={this.state.datesVisit}
-          />
-          <Pictures
-            show={this.state.showPictures}
-            hide={() => this.setState({ showPictures: false })}
-            title={this.state.targetAcc.Title}
-            img={this.state.targetAcc.pictures ? this.state.targetAcc.pictures : [this.state.firstPic]}
-            description={this.state.targetAcc.Description}
-          />
-        </Container>
+                    </div>
+                }
+              </ListGroup>
+
+              <VisitAccomodation
+                show={this.state.showToVisit}
+                hide={() => this.setState({ showToVisit: false })}
+                accomo={this.state.targetAcc}
+                datesVisit={this.state.datesVisit}
+              />
+              <Pictures
+                show={this.state.showPictures}
+                hide={() => this.setState({ showPictures: false })}
+                title={this.state.targetAcc.Title}
+                img={this.state.targetAcc.pictures ? this.state.targetAcc.pictures : [this.state.firstPic]}
+                description={this.state.targetAcc.Description}
+              />
+            </Container>
+        }
       </Row>
     );
   }
