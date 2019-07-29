@@ -29,9 +29,9 @@ export default class DatesVisit extends Component {
     }
 
     componentDidUpdate(p, s) {
-        console.log(this.props.dates);
         if (this.props.dates !== p.dates) {
             this.setState({ dates: this.props.dates })
+            console.log(this.props.dates);
         }
     }
 
@@ -45,7 +45,7 @@ export default class DatesVisit extends Component {
         fetch(`${apiUrl}adddatevisit`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         }).then(response => response.json())
@@ -82,7 +82,7 @@ export default class DatesVisit extends Component {
         fetch(`${apiUrl}updatedatevisit`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         }).then(response => response.json())

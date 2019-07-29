@@ -30,7 +30,7 @@ export default class Management extends Component {
         fetch(`${apiUrl}users`, {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             }
         }).then(response => response.json())
             .then(res => {
@@ -51,7 +51,7 @@ export default class Management extends Component {
         fetch(`${apiUrl}profiles`, {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             }
         }).then(response => response.json())
             .then(res => {

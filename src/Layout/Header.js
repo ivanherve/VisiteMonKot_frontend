@@ -19,20 +19,20 @@ class Header extends Component {
         fetch(apiUrl + 'signout', {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
             }
         })
             .then(response => response.json())
             .then(res => {
-                if (res.status === 'success') {
-                    sessionStorage.setItem('userData', '');
-                    sessionStorage.clear();
-                    //this.setState({redirect: true});
-                    swal(res.response);
-                    //return (<Redirect to='/login' />)
-                    this.props.onClick();
-                }
-                else console.log(res.response);
+                //if (res.status === 'success') {
+                sessionStorage.setItem('userData', '');
+                sessionStorage.clear();
+                //this.setState({redirect: true});
+                swal(res.response);
+                //return (<Redirect to='/login' />)
+                this.props.onClick();
+                console.log(res.response);
+                //}
             })
     }
 

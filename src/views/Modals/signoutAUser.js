@@ -11,7 +11,7 @@ export default class SignOutAUser extends Component {
         fetch(`${apiUrl}signoutauser`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         }).then(response => response.json())

@@ -24,7 +24,7 @@ export default class ResetPwd extends Component {
         fetch(apiUrl + 'resetpwd', {
             method: 'POST',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })

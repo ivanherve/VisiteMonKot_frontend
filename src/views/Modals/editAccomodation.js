@@ -126,7 +126,7 @@ export default class EditAccomodation extends Component {
         fetch(apiUrl + 'updateaccomodation', {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })

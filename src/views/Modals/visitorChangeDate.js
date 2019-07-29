@@ -44,7 +44,7 @@ export default class VisitorChangeDate extends Component {
         fetch(`${apiUrl}updatemyvisit`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })

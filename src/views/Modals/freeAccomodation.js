@@ -18,7 +18,7 @@ export default class FreeAccomodation extends Component {
         fetch(apiUrl+'freeaccomodation',{
             method: 'post',
             headers:{
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })

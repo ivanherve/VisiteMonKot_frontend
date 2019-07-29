@@ -29,7 +29,7 @@ export default class VisitAccomodation extends Component {
         fetch(apiUrl + 'visitaccomodation', {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })
