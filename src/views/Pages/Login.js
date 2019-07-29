@@ -52,6 +52,40 @@ class Login extends Component {
       })
   }
 
+  pwdLost = () => {
+    let data = new FormData();
+    data.append('email', this.state.email);
+    swal({
+      title: 'Mot de passe perdu',
+      text: 'En poursuivant, vous recevrez un mail avec un nouveau mot de passe généré aléatoirement que vous deverez changer lors de votre première utilisation. \n\n Êtes-vous sûr de vouloir poursuivre ?',
+      icon: 'warning',
+      dangerMode: true,
+      buttons: ["Annuler", "Poursuivre"]
+    })
+      .then(ok => {
+        if (ok) {
+          fetch(`${apiUrl}pwdlost`, {
+            method: 'post',
+            body: data
+          })
+            .then(response => response.json())
+            .then(res => {
+              if (res.status === 'error') {
+                swal({
+                  text: res.response[0],
+                  icon: 'warning'
+                })
+              } else {
+                swal({
+                  text: res.response,
+                  icon: 'success'
+                })
+              }
+            })
+        }
+      })
+  }
+
   render() {
     if (this.state.redirect) {
       return (<Redirect to="/" />)
@@ -89,7 +123,7 @@ class Login extends Component {
                             Se connecter
                           </Button>
                         </Col>
-                        <Col xs={6} className="text-right">
+                        <Col xs={6} className="text-right" onClick={() => this.pwdLost()}>
                           <Button variant="outline-primary">Mdp oublié ?</Button>
                         </Col>
                       </Row>
@@ -98,9 +132,9 @@ class Login extends Component {
                 </Card>
                 <Card bg="success" style={{ color: 'white' }}>
                   <Card.Header className="text-center">
-                  <Card.Title><h1>Inscription</h1></Card.Title>
+                    <Card.Title><h1>Inscription</h1></Card.Title>
                   </Card.Header>
-                    <SignUp redirection={() => this.setState({ redirect: true })} />
+                  <SignUp redirection={() => this.setState({ redirect: true })} />
                 </Card>
               </CardGroup>
             </Col>
@@ -113,7 +147,8 @@ class Login extends Component {
 
 const styles = {
   content: {
-    backgroundImage: 'url(' + backgroundImg + ')',
+    backgroundColor: '#c6f7d6',
+    //backgroundImage: 'url(' + backgroundImg + ')',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
