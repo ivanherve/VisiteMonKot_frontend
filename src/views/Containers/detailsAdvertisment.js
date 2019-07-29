@@ -29,14 +29,14 @@ export default class DetailsAdvertisment extends Component {
         fetch(apiUrl + 'getvisitors/' + id, {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
         })
             .then(response => response.json())
             .then(res => {
                 if (res.status === 'error') {
-                    //swal(res.response);
-                    console.log(res.response)
+                    console.log(res.response);
+                    this.setState({ visitors: [] })
                 } else {
                     console.log(res.response);
                     this.setState({ visitors: res.response })
@@ -48,7 +48,7 @@ export default class DetailsAdvertisment extends Component {
         fetch(`${apiUrl}getvisitdates/${id}`, {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             }
         })
             .then(response => response.json())
@@ -64,14 +64,18 @@ export default class DetailsAdvertisment extends Component {
 
     componentDidMount() {
         console.log(this.props.advertisment);
+        this.getVisitors(this.props.advertisment.accomodation_id);
+        this.fetchVisitDate(this.props.advertisment.accomodation_id);
     }
 
     componentDidUpdate(nextProps) {
-        console.log([this.props.advertisment, nextProps, this.state.datesVisit]);
-        if (this.props.advertisment.accomodation_id !== nextProps.advertisment.accomodation_id) {
+        /**/
+        if (this.props.advertisment !== nextProps.advertisment) {
             this.getVisitors(this.props.advertisment.accomodation_id);
             this.fetchVisitDate(this.props.advertisment.accomodation_id);
+            console.log([this.props.advertisment, nextProps, this.state.datesVisit, this.state.visitors]);
         }
+
     }
 
     render() {
