@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Container, Form, Row, Button, Image, Modal, Col, Carousel } from 'react-bootstrap';
 import { apiUrl } from '../../router';
 import deepai from 'deepai';
-import unirest from 'unirest';
+import logo from "../../logo/vmk_v3_1.png";
+import logoname from "../../logo/vmk_nom.png";
 
 import FileBase64 from 'react-file-base64';
 
@@ -17,6 +18,7 @@ export default class Test extends Component {
         show: false,
         index: 0,
         direction: null,
+        loading: null,
     }
 
     send = (files) => {
@@ -31,7 +33,7 @@ export default class Test extends Component {
         fetch(`${apiUrl}uploadimages`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
             },
             body: data
         }).then(response => response.json())
@@ -45,7 +47,7 @@ export default class Test extends Component {
         fetch(`${apiUrl}getimage`, {
             method: 'get',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
             }
         }).then(res => res.json())
             .then(res => {
@@ -83,11 +85,33 @@ export default class Test extends Component {
         });
     }
 
+    sendMail = () => {
+        fetch(`${apiUrl}confvisit`, {
+            method: 'get',
+            headers: {
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+            }
+        }).then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    alert(res.response);
+                    console.log(res.response)
+                } else {
+                    alert('error');
+                    console.log('error')
+                }
+            })
+    }
+
     componentDidMount() {
         this.getImg();
     }
 
     render() {
+        setTimeout(() => { this.setState({ loading: 1 }) }, 2000)
+        if (!this.state.loading) return (
+            <div>Loading...</div>
+        )
         return (
             <Container>
                 <h1>Test ZONE</h1>
@@ -146,6 +170,14 @@ export default class Test extends Component {
 
                 </Row>
                 {/*<Image src={this.state.oneImg ? this.state.oneImg : defaultImg} />*/}
+                <br />
+                <h3>Send an e-mail</h3>
+                <hr />
+                <Button onClick={() => this.sendMail()}>E-MAIL</Button>
+                <br />
+                <Image src={logo} fluid />
+                <hr />
+                <Image src={logoname} />
                 <Modal show={this.state.show} onHide={() => this.setState({ show: false })} centered size='lg'>
                     <Modal.Header closeButton>
                         <Modal.Title>Titre Logement</Modal.Title>
@@ -185,6 +217,7 @@ export default class Test extends Component {
                 </Modal>
             </Container>
         )
+
     }
 }
 
