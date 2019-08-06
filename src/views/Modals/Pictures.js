@@ -4,7 +4,7 @@ import { Modal, Row, Col, Carousel, Image } from 'react-bootstrap';
 export default class Pictures extends Component {
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.props.img)
+        //console.log(this.props.img)
     }
 
     render() {
