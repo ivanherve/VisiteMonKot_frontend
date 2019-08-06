@@ -46,7 +46,10 @@ class Login extends Component {
           this.setState({ redirect: true });
         }
         else {
-          swal('Votre adresse mail ou votre mot de passe est incorrect');
+          swal({
+            icon: 'warning',
+            text: res.response[0]
+          });
           console.log(res.response)
         }
       })

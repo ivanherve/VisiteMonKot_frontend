@@ -128,7 +128,7 @@ export default class AddAnnounce extends Component {
         });
         console.log(e.target.value)
     }
-
+/*
     sendImages = (files) => {
         files.map(file => {
             //b64.push(file.base64)
@@ -148,7 +148,7 @@ export default class AddAnnounce extends Component {
                 })
         })
     }
-
+*/
     addOneAnnounce = () => {
         let imgb64 = [];
         this.state.pictures.map(pic => {

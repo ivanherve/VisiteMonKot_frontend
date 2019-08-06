@@ -16,9 +16,10 @@ export default class VisitAccomodation extends Component {
     }
 
     componentDidUpdate(nextProps, nextState) {
-        if (this.props.datesVisit !== nextProps.datesVisit)
+        if (this.props.datesVisit !== nextProps.datesVisit) {
             this.setState({ datesVisit: this.props.datesVisit, dateVisit: this.props.datesVisit[0].start_date });
-        console.log(this.props.datesVisit, this.state.datesVisit);
+            console.log(this.props.datesVisit, this.state.datesVisit);
+        }
     }
 
     visitAccomodation = (aid, date, time) => {
@@ -61,7 +62,7 @@ export default class VisitAccomodation extends Component {
 
     render() {
         let accomo = this.props.accomo;
-        let datesVisit = this.state.datesVisit.sort((a,b) => 
+        let datesVisit = this.state.datesVisit.sort((a, b) =>
             (a.start_date > b.start_date) ? 1 : ((b.start_date > a.start_date) ? -1 : 0)
         );
         let today = moment(Date()).format('YYYY-MM-Do');

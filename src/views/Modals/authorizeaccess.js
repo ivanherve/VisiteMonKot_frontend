@@ -13,7 +13,7 @@ export default class AuthoriseAccess extends Component {
         fetch(`${apiUrl}authorizeuser`, {
             method: 'post',
             headers: {
-                api_token: JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         }).then(response => response.json())
