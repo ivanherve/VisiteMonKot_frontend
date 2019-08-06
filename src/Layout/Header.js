@@ -70,6 +70,9 @@ class Header extends Component {
                                 <Nav.Item>
                                     <Link className="nav-link" to="/visits">Mes visites</Link>
                                 </Nav.Item>
+                                <Nav.Item>
+                                    <Link className="nav-link" to="/likes">Mes favoris</Link>
+                                </Nav.Item>
                                 {
                                     user.profil_id === 3
                                         ?
@@ -123,6 +126,12 @@ class Header extends Component {
                         <Nav className="mr-auto">
                             <Nav.Item>
                                 <Nav.Link disabled to="/advertisments">Mes annonces</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link disabled to="/visits">Mes visites</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link disabled className="nav-link" to="/likes">Mes favoris</Nav.Link>
                             </Nav.Item>
                         </Nav>
                         <Nav>
