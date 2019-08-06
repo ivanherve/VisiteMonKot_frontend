@@ -60,6 +60,21 @@ export default class SideBarFilter extends Component {
                                     </Form>
                                 </Card.Body>
                             </div>
+                        </article>                        
+                        <article className="card-group-item">
+                            <Card.Header>
+                                <Card.Title>
+                                    <h6>Localisation</h6>
+                                </Card.Title>
+                            </Card.Header>
+                            <div className="filter-content">
+                                <Card.Body>
+                                    <Form>
+                                        <Form.Label>Ville</Form.Label>
+                                        <Form.Control placeholder="ex: Bruxelles" type="text" onChange={this.props.filterCity} />
+                                    </Form>
+                                </Card.Body>
+                            </div>
                         </article>
                         <article className="card-group-item">
                             <Card.Header>
