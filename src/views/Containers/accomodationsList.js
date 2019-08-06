@@ -18,11 +18,13 @@ import LoadingComponent from './LoadingComponent';
 
 
 export default class AccomodationsList extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
       accomodations: [],
       query: '',
+      queryCity: '',
       priceMin: 0,
       priceMax: 0,
       max: 0,
@@ -53,7 +55,7 @@ export default class AccomodationsList extends Component {
           swal(res.response[0]);
           console.log(res.response)
         } else {
-          console.log(res.response);
+          //console.log(res.response);
           this.setState({ types: res.response })
         }
       })
@@ -70,15 +72,15 @@ export default class AccomodationsList extends Component {
         } else {
           if (res.response.length === qty) {
             this.setState({ accomodations: res.response, hasMoreAccomo: true });
-            console.log([res.response.length, qty])
+            //console.log([res.response.length, qty])
           } else this.setState({ hasMoreAccomo: false });
           res.response.map(el =>
             arr.push(el.priceCharges + el.priceRent)
           );
           this.setState({ priceMax: Math.max(...arr) });
-          console.log(Math.max(...arr));
+          //console.log(Math.max(...arr));
           this.setState({ max: Math.max(...arr) });
-          this.fetchTypes();
+
         }
       })
   }
@@ -103,13 +105,21 @@ export default class AccomodationsList extends Component {
 
   componentDidMount() {
     this.fetchAccomodations();
+    this.fetchTypes();
+    this._isMounted = true;
   }
 
   componentDidUpdate(nextProps, nextState) {
     //console.log([this.state.priceMax,nextState.max]);
-    if ((this.state.priceMax === 0 || this.state.priceMax === "") && this.state.priceMax !== this.state.max) {
-      this.setState({ priceMax: this.state.max });
+    if (this.state !== nextState) {
+      if ((this.state.priceMax === 0 || this.state.priceMax === "") && this.state.priceMax !== this.state.max) {
+        this.setState({ priceMax: this.state.max });
+      }
     }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   render() {
@@ -168,7 +178,12 @@ export default class AccomodationsList extends Component {
           acc;
       }
     );
-    filteredFurnitures.map(el => {
+    let filteredCity = filteredFurnitures.filter(
+      acc => {
+        return acc.cityName.toLowerCase().indexOf(this.state.queryCity) !== -1;
+      }
+    )
+    filteredCity.map(el => {
       items.push(el);
     });
     let SortedFromNewest = this.state.isSortedFromNewest ? items.sort(
@@ -197,6 +212,7 @@ export default class AccomodationsList extends Component {
               filterWifi={e => this.setState({ toFilterWifi: document.getElementById(e.target.id).checked })}
               filterFurnitures={e => this.setState({ toFilterFurnitures: document.getElementById(e.target.id).checked })}
               min={this.state.priceMin === 0 ? this.state.max : this.state.priceMin}
+              filterCity={e => this.setState({ queryCity: e.target.value })}
             />
           </StickyBox>
         </div>
@@ -222,7 +238,7 @@ export default class AccomodationsList extends Component {
                       pageStart={10}
                       loadMore={this.fetchAccomodations.bind(this)}
                       hasMore={this.state.hasMoreAccomo}
-                      loader={<div className="loader">Loading ...</div>}
+                      loader={<div className="loader">Chargement ...</div>}
                     >
                       {
                         SortedFromNewest.map(accomo =>
@@ -278,7 +294,7 @@ class AccItem extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props)
+    //console.log(this.props)
   }
 
   render() {
@@ -335,7 +351,15 @@ class AccItem extends Component {
               <Col xs={10}>
                 <h3>{accomo.Title}</h3>
                 <h1><p style={{ fontWeight: 'bolder', fontSize: '3rem' }}>{accomo.priceRent + accomo.priceCharges} € </p></h1>
-                <p>{accomo.addressVisible === 1 ? 'Adresse: ' + accomo.address + ', ' + accomo.cityName : null}</p>
+                <div>
+                  {
+                    accomo.addressVisible === 1
+                      ?
+                      <p><u>Adresse</u> : {accomo.address} {accomo.cityName}</p>
+                      :
+                      null
+                  }
+                </div>
                 <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
                   <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
               </p>
@@ -343,11 +367,21 @@ class AccItem extends Component {
               {
                 sessionStorage.getItem('userData')
                   ?
-                  <Col xs={2}>
-                    <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
-                      Visiter ?
-                  </Button>
-                  </Col>
+                  JSON.parse(sessionStorage.getItem('userData')).user.profil_id === 1
+                    ?
+                    <Col>
+                      <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Activez votre compte</Tooltip>}>
+                        <span className="d-inline-block">
+                          <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter ?</Button>
+                        </span>
+                      </OverlayTrigger>
+                    </Col>
+                    :
+                    <Col xs={2}>
+                      <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
+                        Visiter ?
+                      </Button>
+                    </Col>
                   :
                   <Col>
                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Connectez-vous d'abord</Tooltip>}>
@@ -362,6 +396,7 @@ class AccItem extends Component {
 
             <Row>
               <Col xs={2}>{accomo.nbVisit} visites</Col>
+              <Col xs='2'>{accomo.nbInterested ? accomo.nbInterested : 0} Intéressé</Col>
               <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom} chambres</Col>
               {
                 accomo.HasWifi === 1
@@ -380,19 +415,24 @@ class AccItem extends Component {
               {
                 accomo.HasFurnitures === 1
                   ?
-                  <Col xs={2}>
-                    <OverlayTrigger overlay={
-                      <Popover title='Meubles'>
-                        <ListGroup>
-                          <ListGroup.Item>Lit</ListGroup.Item>
-                          <ListGroup.Item>Armoire</ListGroup.Item>
-                          <ListGroup.Item>Table</ListGroup.Item>
-                        </ListGroup>
-                      </Popover>
-                    }>
-                      <Badge variant='outline-dark'>Meublé</Badge>
-                    </OverlayTrigger>
-                  </Col>
+                  <div>
+                    <Badge variant='outline-dark'>Meublé</Badge>
+                    {/*
+                    <Col xs={2}>
+                      <OverlayTrigger overlay={
+                        <Popover title='Meubles'>
+                          <ListGroup variant='flush'>
+                            <ListGroup.Item><Badge>2</Badge> Lit</ListGroup.Item>
+                            <ListGroup.Item><Badge>3</Badge> Armoire</ListGroup.Item>
+                            <ListGroup.Item><Badge>1</Badge> Table</ListGroup.Item>
+                          </ListGroup>
+                        </Popover>
+                      }>
+                        <Badge variant='outline-dark'>Meublé</Badge>
+                      </OverlayTrigger>
+                    </Col>
+                  */}
+                  </div>
                   :
                   null
               }
@@ -453,6 +493,7 @@ const styles = {
   zoom: {
     transform: 'scale(1.1)',
     transition: 'transform .2s', /* Animation */
-    cursor: 'pointer'
+    cursor: 'pointer',
+    zIndex: '100'
   }
 }
