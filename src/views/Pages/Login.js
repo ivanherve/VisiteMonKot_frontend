@@ -127,7 +127,7 @@ class Login extends Component {
                           </Button>
                         </Col>
                         <Col xs={6} className="text-right" onClick={() => this.pwdLost()}>
-                          <Button variant="outline-primary">Mdp oublié ?</Button>
+                          <Button variant="outline-primary">Mot de passe oublié ?</Button>
                         </Col>
                       </Row>
                     </Form>

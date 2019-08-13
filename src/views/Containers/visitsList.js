@@ -123,15 +123,17 @@ export default class VisitsList extends Component {
     notVisitedYet = () => {
         this.setState({
             filtred: this.state.accomodations.filter(acc => {
-                return acc.visitDate < moment().format("YYYY-MM-DD H:mm");
-            })
+                return acc.visitDate > moment().format("YYYY-MM-DD H:mm");
+            }), 
+            //targetAcc: this.state.accomodations[0]
         })
     }
 
     visited = () => {
+        /**/
         this.setState({
             filtred: this.state.accomodations.filter(acc => {
-                return acc.visitDate > moment().format("YYYY-MM-DD H:mm");
+                return acc.visitDate < moment().format("YYYY-MM-DD H:mm");
             })
         })
     }
@@ -139,19 +141,19 @@ export default class VisitsList extends Component {
     abortController = new AbortController();
 
     componentDidMount() {
-        this._isMounted = true;
+        //this._isMounted = true;
         this.getVisits();
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filtred !== prevState.filtred) {
-            this.setState({ targetAcc: this.state.filtred[0] });
+            if(!this.state.targetAcc) this.setState({ targetAcc: this.state.filtred[0] });
         }
     }
 
     componentWillUnmount() {
-        this._isMounted = false;
-        this.abortController.abort();
+        //this._isMounted = false;
+        //this.abortController.abort();
     }
 
     render() {
@@ -170,9 +172,9 @@ export default class VisitsList extends Component {
                             <Alert variant='info'>
                                 <h5>Filtrer :</h5>
                                 <Row>
-                                    <Col><Form.Check custom id="f1" type='radio' name='filter' label='Tout' onChange={() => this.setState({ filtred: this.state.accomodations })} /></Col>
-                                    <Col><Form.Check custom id="f2" type='radio' name='filter' label='Déjà visité' onChange={() => this.notVisitedYet()} /></Col>
-                                    <Col><Form.Check custom id="f3" type='radio' name='filter' label='Pas encore visité' onChange={() => this.visited()} /></Col>
+                                    <Col><Form.Check custom id="f1" type='radio' name='filter' label='Tout' onChange={() => this.setState({ filtred: this.state.accomodations, targetAcc: this.state.accomodations[0] })} /></Col>
+                                    <Col><Form.Check custom id="f2" type='radio' name='filter' label='Déjà visité' onChange={() => this.visited()} /></Col>
+                                    <Col><Form.Check custom id="f3" type='radio' name='filter' label='Pas encore visité' onChange={() => this.notVisitedYet()} /></Col>
                                 </Row>
                             </Alert>
                             {
@@ -296,6 +298,19 @@ export default class VisitsList extends Component {
                                                 </Card>
                                             </Col>
                                         </Row>
+                                        <VisitorChangeDate
+                                            show={this.state.showChangeDate}
+                                            hide={() => this.setState({ showChangeDate: false })}
+                                            date={acc.visitDate}
+                                            dates={this.state.dateVisitAcc}
+                                        />
+                                        <CancelVisit
+                                            show={this.state.showCancel}
+                                            hide={() => this.setState({ showCancel: false })}
+                                            title={acc.Title}
+                                            date={acc.visitDate}
+                                            aid={acc.accomodation_id}
+                                        />
                                     </div>
                                     :
                                     <div style={styles.image}>
@@ -304,19 +319,6 @@ export default class VisitsList extends Component {
                                         </div>
                                     </div>
                             }
-                            <VisitorChangeDate
-                                show={this.state.showChangeDate}
-                                hide={() => this.setState({ showChangeDate: false })}
-                                date={acc.visitDate}
-                                dates={this.state.dateVisitAcc}
-                            />
-                            <CancelVisit
-                                show={this.state.showCancel}
-                                hide={() => this.setState({ showCancel: false })}
-                                title={acc.Title}
-                                date={acc.visitDate}
-                                aid={acc.accomodation_id}
-                            />
                         </div>
                 }
 

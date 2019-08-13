@@ -85,20 +85,36 @@ export default class SignUp extends Component {
         fetch(`${API_URL_TEL}`)
             .then(res => res.json())
             .then(data => {
-                data.map(d => countries.push({
-                    name: d.translations.fr ? d.translations.fr : d.name,
-                    code: d.callingCodes[0]
-                }))
+                data.map(d => {
+                    if (d.callingCodes[0] !== '32') {
+                        countries.push({
+                            name: d.translations.fr ? d.translations.fr : d.name,
+                            code: d.callingCodes[0]
+                        })
+                    } else {
+                        countries.unshift({
+                            name: d.translations.fr ? d.translations.fr : d.name,
+                            code: d.callingCodes[0]
+                        })
+                    }
+                })
                 this.setState({ countries });
-                this.setState({ callingCode: countries[0].code })
+                this.setState({ callingCode: countries[5].code })
             })
     }
 
     handleCode = data => {
+
         let c = data.split(" ");
-        let callingCode = c[1];
+        let callingCode = c[1];/*
         this.setState({ callingCode })
         console.log(callingCode)
+        */
+        this.state.countries.map(el => {
+            if (el.code === callingCode) {
+                console.log(this.state.countries.indexOf(el))
+            }
+        })
     }
 
     recaptchaLoaded() {
@@ -117,7 +133,7 @@ export default class SignUp extends Component {
     render() {
         return (
             <Card.Body className="text-center">
-                <p>Cherchez, Annoncez et organisez des visites de la plus simple des façons</p>
+                <p>Chercher, annoncer et organiser des visites de la plus simple des façons</p>
                 <Form>
                     <Form.Control placeholder="Prénom*" name="firstname" type="text" required onChange={e => this.setState({ firstname: e.target.value })} />
                     <br />
@@ -127,7 +143,7 @@ export default class SignUp extends Component {
                     <br />
                     <Row>
                         <Col xs='5'>
-                            <Form.Control as='select' onChange={(e) => this.handleCode(e.target.value)}>
+                            <Form.Control as='select' onChange={e => this.handleCode(e.target.value)}>
                                 {
                                     this.state.countries.map(d =>
                                         <option key={this.state.countries.indexOf(d)}>+ {d.code} - {d.name}</option>
@@ -136,7 +152,7 @@ export default class SignUp extends Component {
                             </Form.Control>
                         </Col>
                         <Col xs='7'>
-                            <Form.Control type='number' placeholder='Numéro de téléphone *' maxLength='9' onChange={e => this.setState({ mobile: e.target.value })} />
+                            <Form.Control type='number' placeholder='Téléphone *' maxLength='9' onChange={e => this.setState({ mobile: e.target.value })} />
                         </Col>
                     </Row>
                     <br />

@@ -5,12 +5,12 @@ export default class SideBarFilter extends Component {
     render() {
         return (
             <nav className="sidebar-wrapper">
-                <div className="sidebar-content" style={{ maxWidth: '200px', overflow: 'auto' }}>
+                <div className="sidebar-content" style={{ maxWidth: '210px', overflow: 'auto' }}>
                     <Card>
                         <article className="card-group-item">
                             <Card.Header>
                                 <Card.Title>
-                                    <h6>Filtrer</h6>
+                                    <h6>Ma recherche</h6>
                                 </Card.Title>
                             </Card.Header>
                             <div className="filter-content">
@@ -35,78 +35,51 @@ export default class SideBarFilter extends Component {
                                         <Form.Check
                                             custom
                                             type="radio"
-                                            label={<div style={{ fontSize: '0.7rem' }}>du moins cher au plus cher</div>}
+                                            label={<div style={{ fontSize: '0.7rem' }}>prix par ordre croissant</div>}
                                             name="filter"
                                             id="f3"
                                             onChange={this.props.sortfromcheapest}
                                         />
                                         <Form.Check
                                             custom
-                                            type="checkbox"
-                                            label={<div style={{ fontSize: '0.7rem' }}>ceux qui n'ont jamais été visité</div>}
+                                            type="radio"
+                                            label={<div style={{ fontSize: '0.7rem' }}>prix par ordre décroissant</div>}
                                             name="filter"
                                             id="f4"
-                                            onChange={this.props.filterNotVisited}
-                                        />
-                                        <Form.Check
-                                            custom
-                                            disabled={!sessionStorage.getItem('userData')}
-                                            type="checkbox"
-                                            label={<div style={{ fontSize: '0.7rem' }}>ceux que je n'ai pas publié</div>}
-                                            name="filter"
-                                            id="f5"
-                                            onChange={this.props.filterNotPublished}
+                                            onChange={this.props.sortfrommostexpensive}
                                         />
                                     </Form>
                                 </Card.Body>
                             </div>
-                        </article>                        
+                        </article>
+                        <hr />
                         <article className="card-group-item">
-                            <Card.Header>
-                                <Card.Title>
-                                    <h6>Localisation</h6>
-                                </Card.Title>
-                            </Card.Header>
                             <div className="filter-content">
                                 <Card.Body>
                                     <Form>
-                                        <Form.Label>Ville</Form.Label>
-                                        <Form.Control placeholder="ex: Bruxelles" type="text" onChange={this.props.filterCity} />
+                                        <Form.Control placeholder="Ville" type="text" onChange={this.props.filterCity} />
                                     </Form>
+                                    <br />
+                                    <Row>
+                                        <Col>
+                                            <Form>
+                                                <Form.Control type="number" min={0} placeholder="€ min" onChange={this.props.filterMin} />
+                                            </Form>
+                                        </Col>
+                                        <Col>
+                                            <Form>
+                                                <Form.Control type="number" min={this.props.min} placeholder="€ max" onChange={this.props.filterMax} />
+                                            </Form>
+                                        </Col>
+                                    </Row>
                                 </Card.Body>
                             </div>
                         </article>
                         <article className="card-group-item">
-                            <Card.Header>
-                                <Card.Title>
-                                    <h6>Prix</h6>
-                                </Card.Title>
-                            </Card.Header>
+                            <hr />
                             <div className="filter-content">
                                 <Card.Body>
-                                    <Form as={Row}>
-                                        <Form.Group>
-                                            <Col>
-                                                <Form.Label>Min</Form.Label>
-                                                <Form.Control type="number" min={0} placeholder="0 €" onChange={this.props.filterMin} />
-                                            </Col>
-                                            <Col>
-                                                <Form.Label>Max</Form.Label>
-                                                <Form.Control type="number" min={this.props.min} placeholder="200 €" onChange={this.props.filterMax} />
-                                            </Col>
-                                        </Form.Group>
-                                    </Form>
-                                </Card.Body>
-                            </div>
-                        </article>
-                        <article className="card-group-item">
-                            <Card.Header>
-                                <Card.Title>
                                     <h6>Type</h6>
-                                </Card.Title>
-                            </Card.Header>
-                            <div className="filter-content">
-                                <Card.Body>
                                     <Form>
                                         <Form.Check
                                             custom
@@ -135,13 +108,10 @@ export default class SideBarFilter extends Component {
                             </div>
                         </article>
                         <article className="card-group-item">
-                            <Card.Header>
-                                <Card.Title>
-                                    <h6>Caractéristique</h6>
-                                </Card.Title>
-                            </Card.Header>
+                            <hr />
                             <div className="filter-content">
                                 <Card.Body>
+                                    <h6>Équipements</h6>
                                     <Form>
                                         <Form.Check
                                             custom
@@ -165,6 +135,33 @@ export default class SideBarFilter extends Component {
                                 </Card.Body>
                             </div>
                         </article>
+                        <article className="card-group-item">
+                            <div className="filter-content">
+                                <Card.Body>
+                                    <h6>Autres</h6>
+                                    <Form>
+                                        <Form.Check
+                                            custom
+                                            type="checkbox"
+                                            label={<div>n'ont jamais été visité</div>}
+                                            name="filter"
+                                            id="f5"
+                                            onChange={this.props.filterNotVisited}
+                                        />
+                                        <Form.Check
+                                            custom
+                                            disabled={!sessionStorage.getItem('userData')}
+                                            type="checkbox"
+                                            label={<div>je n'ai pas publié</div>}
+                                            name="filter"
+                                            id="f6"
+                                            onChange={this.props.filterNotPublished}
+                                        />
+                                    </Form>
+                                </Card.Body>
+                            </div>
+                        </article>
+
                     </Card>
                 </div>
             </nav>

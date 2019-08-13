@@ -302,7 +302,7 @@ export class Utilisateurs extends Component {
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Etat</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control style={user.nbTokenActifs > 0 ? styles.online : styles.notonline} plaintext readOnly value={user.nbTokenActifs > 0 || !user.nbTokenActifs ? `En ligne ${user.nbTokenActifs}` : 'Hors ligne'} />
+                                        <Form.Control style={user.nbTokenActifs > 0 ? styles.online : styles.notonline} plaintext readOnly value={user.nbTokenActifs ? user.nbTokenActifs > 0 ?  `En ligne` : 'Hors ligne' : 'Hors ligne'} />
                                     </Col>
                                 </Form.Group>
                                 <hr />

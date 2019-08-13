@@ -3,7 +3,7 @@ import 'moment/locale/fr';
 import React, { Component } from 'react';
 import { Card, Col, Container, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
-import ProfilePic from '../../Pictures/default-pic.jpg';
+import ProfilePic from '../../Pictures/testimonial-2.jpg';
 import ProfileDetails from './profileDetails';
 import ResetPwd from './resetpwd';
 
@@ -18,11 +18,6 @@ export default class Profile extends Component {
                         <Col xs={3}>
                             <Card>
                                 <Card.Img variant="top" src={ProfilePic} />
-                                <Card.Body>
-                                    <Card.Title style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <h3>{user.Firstname} {user.Surname}</h3>
-                                    </Card.Title>
-                                </Card.Body>
                                 <ListGroup className="list-group-flush">
                                     <Link to={'/profile/'+user.user_id} className="list-group-item">Modifier mes informations personnelles</Link>
                                     <Link to={'/profile/resetpwd/'+user.user_id} className="list-group-item">Modifier mon mot de passe</Link>

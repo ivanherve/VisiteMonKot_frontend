@@ -119,7 +119,7 @@ export default class ProfileDetails extends Component {
             <div>
                 <Row>
                     <Col xs='9'>
-                        <h2>Informations Générales</h2>
+                        <h2>{user.Firstname} {user.Surname}</h2>
                     </Col>
                     <Col xs='3'>
                         {
@@ -171,7 +171,7 @@ export default class ProfileDetails extends Component {
                     </Form.Group>
                     <Form.Group as={Row} controlId="formPlaintextEmail">
                         <Form.Label column sm="3">
-                            N° de Téléphone
+                            N° téléphone
                         </Form.Label>
                         <Col sm="9">
                             {

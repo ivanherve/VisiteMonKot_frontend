@@ -187,7 +187,7 @@ export default class AddAnnounce extends Component {
                 if (res.status === 'success') {
                     swal({
                         title: 'Parfait!',
-                        text: `Annonce ajouté`,
+                        text: `Annonce ajoutée`,
                         icon: 'success',
                         button: {
                             closeModal: false,
@@ -230,7 +230,7 @@ export default class AddAnnounce extends Component {
                         <br />
                         <Form.Control placeholder="Charges €*" name="priceCharges" min="0" type="number" required onChange={e => this.setState({ priceCharges: e.target.value })} />
                         <br />
-                        <Form.Label>Durée de sous-location *</Form.Label>
+                        <Form.Label>Période de sous-location *</Form.Label>
                         <br />
                         <DateRangePicker
                             startDateId="beginingTime"
@@ -400,7 +400,7 @@ export default class AddAnnounce extends Component {
                                 checked={this.state.hasWifi === 0 ? false : true}
                                 type="checkbox"
                                 id="custom-checkbox1"
-                                label="Y'a t-il du WiFi ?"
+                                label="WiFi ?"
                                 onChange={e => {
                                     if (this.state.hasWifi === 0) {
                                         this.setState({ hasWifi: 1 });
@@ -415,7 +415,7 @@ export default class AddAnnounce extends Component {
                                 checked={this.state.hasFurnitures === 0 ? false : true}
                                 type="checkbox"
                                 id="custom-checkbox2"
-                                label="Est-il meublé ?"
+                                label="Meublé ?"
                                 onChange={e => {
                                     if (this.state.hasFurnitures === 0) {
                                         this.setState({ hasFurnitures: 1 });
@@ -430,7 +430,7 @@ export default class AddAnnounce extends Component {
                                 checked={this.state.hasCarPark === 0 ? false : true}
                                 type="checkbox"
                                 id="custom-checkbox3"
-                                label="Y'a t-il un parking ?"
+                                label="Parking ?"
                                 onChange={e => {
                                     if (this.state.hasCarPark === 0) {
                                         this.setState({ hasCarPark: 1 });
