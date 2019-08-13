@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import { Button, Col, Container, FormControl, Image, ListGroup, OverlayTrigger, Row, Tooltip, Badge, Popover, Card } from 'react-bootstrap';
 import StickyBox from "react-sticky-box";
 import '../../App.css';
-import bedroom from '../../Pictures/bedroom-ex.jpg';
-import building from '../../Pictures/building.png';
-import garage from '../../Pictures/garage-example.jpg';
-import house from '../../Pictures/house-example.jpg';
+import bedroom from '../../Pictures/bedroom-ex_2.jpg';
+import building from '../../Pictures/building_2.jpg';
+import garage from '../../Pictures/garage-example_2.jpg';
+import house from '../../Pictures/house-example_2.jpg';
 import backgroundImg from '../../Pictures/Shrug-Emoji.jpg';
 import { apiUrl } from '../../router';
 import VisitAccomodation from '../Modals/visitAccomodation';
@@ -15,6 +15,7 @@ import swal from 'sweetalert';
 import InfiniteScroll from 'react-infinite-scroller';
 import Pictures from '../Modals/Pictures';
 import LoadingComponent from './LoadingComponent';
+import moment from 'moment';
 
 
 export default class AccomodationsList extends Component {
@@ -33,6 +34,7 @@ export default class AccomodationsList extends Component {
       isSortedFromNewest: false,
       isSortedFromOldest: false,
       isSortedFromCheapest: false,
+      isSortedFromMostExpensive: false,
       toFilterNotVisited: false,
       toFilterNotPublished: false,
       toFilterWifi: false,
@@ -192,6 +194,8 @@ export default class AccomodationsList extends Component {
       (a, b) => (a.PublicationDate > b.PublicationDate) ? 1 : ((b.PublicationDate > a.PublicationDate) ? -1 : 0)
     ) : this.state.isSortedFromCheapest ? items.sort(
       (a, b) => ((a.priceRent + a.priceCharges) > (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) > (a.priceRent + a.priceCharges)) ? -1 : 0)
+    ) : this.state.isSortedFromMostExpensive ? items.sort(
+      (a, b) => ((a.priceRent + a.priceCharges) < (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) < (a.priceRent + a.priceCharges)) ? -1 : 0)
     ) : items;
     setTimeout(() => this.setState({ loading: 1 }), 5000);
     //if (!this.state.loading) return <div style={{ display: 'flex', justifyContent: 'center' }}></div>
@@ -204,9 +208,10 @@ export default class AccomodationsList extends Component {
               filterMax={e => this.setState({ priceMax: e.target.value })}
               types={this.state.types}
               changetype={(e) => e.target.id !== 'Tout' ? this.setState({ oneType: e.target.id }) : this.setState({ oneType: '' })}
-              sortfromnewest={() => this.setState({ isSortedFromNewest: true, isSortedFromOldest: false })}
-              sortfromoldest={() => this.setState({ isSortedFromOldest: true, isSortedFromNewest: false })}
-              sortfromcheapest={() => this.setState({ isSortedFromOldest: false, isSortedFromNewest: false, isSortedFromCheapest: true })}
+              sortfromnewest={() => this.setState({ isSortedFromNewest: true, isSortedFromOldest: false, isSortedFromCheapest: false, isSortedFromMostExpensive: false })}
+              sortfromoldest={() => this.setState({ isSortedFromOldest: true, isSortedFromNewest: false, isSortedFromCheapest: false, isSortedFromMostExpensive: false })}
+              sortfromcheapest={() => this.setState({ isSortedFromOldest: false, isSortedFromNewest: false, isSortedFromCheapest: true, isSortedFromMostExpensive: false })}
+              sortfrommostexpensive={() => this.setState({ isSortedFromOldest: false, isSortedFromNewest: false, isSortedFromCheapest: false, isSortedFromMostExpensive: true })}
               filterNotVisited={e => this.setState({ toFilterNotVisited: document.getElementById(e.target.id).checked })}
               filterNotPublished={e => this.setState({ toFilterNotPublished: document.getElementById(e.target.id).checked })}
               filterWifi={e => this.setState({ toFilterWifi: document.getElementById(e.target.id).checked })}
@@ -294,7 +299,7 @@ class AccItem extends Component {
   }
 
   componentDidMount() {
-    //console.log(this.props)
+    //console.log(this.props.accomo)
   }
 
   render() {
@@ -345,6 +350,12 @@ class AccItem extends Component {
                 <div style={{ display: 'flex', justifyContent: 'center', fontSize: '1.5rem' }}>{accomo.type}</div>
               </Card.Footer>
             </Card>
+            <br />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Badge pill variant={variant} style={{ width: variant === 'success' ? '70%' : '40%' }}>
+                <h5>{variant === 'warning' ? 'Visité' : variant === 'danger' ? 'Loué' : 'Pas encore visité'}</h5>
+              </Badge>
+            </div>
           </Col>
           <Col md={{ offset: 1 }}>
             <Row>
@@ -359,10 +370,13 @@ class AccItem extends Component {
                       :
                       null
                   }
+                  <p>
+                    <u>Dates de location</u> : <strong>{moment(accomo.BeginingTime).format('LL')}</strong> jusqu'au <strong>{moment(accomo.EndTime).format('LL')}</strong>
+                  </p>
                 </div>
                 <p style={{ fontStyle: 'italic', fontSize: '1.5rem' }}>
                   <strong>{accomo.priceRent} €</strong> de loyer + <strong>{accomo.priceCharges} €</strong> de charges
-              </p>
+                </p>
               </Col>
               {
                 sessionStorage.getItem('userData')
@@ -379,19 +393,18 @@ class AccItem extends Component {
                     :
                     <Col xs={2}>
                       <Button variant={variant} onClick={showToVisit} disabled={variant === 'danger' || accomo.Owner_user_id === JSON.parse(sessionStorage.getItem('userData')).user.user_id}>
-                        Visiter ?
+                        Visiter
                       </Button>
                     </Col>
                   :
                   <Col>
                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Connectez-vous d'abord</Tooltip>}>
                       <span className="d-inline-block">
-                        <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter ?</Button>
+                        <Button variant={variant} disabled style={{ pointerEvents: 'none' }}>Visiter</Button>
                       </span>
                     </OverlayTrigger>
                   </Col>
               }
-
             </Row>
 
             <Row>
