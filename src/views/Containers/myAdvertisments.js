@@ -60,7 +60,7 @@ export default class MyAdvertisments extends Component {
 
   componentDidMount() {
     this.getAdvertisment();
-  }  
+  }
 
   render() {
     let profil = JSON.parse(sessionStorage.getItem('userData')).user.profil_id;
@@ -97,21 +97,21 @@ export default class MyAdvertisments extends Component {
                   ?
                   <Row>
                     <Col xs={5}>
-                      <ListGroup>
+                      <ListGroup style={{ overflowY: 'auto', height: '600px' }}>
                         {
                           this.state.advertisments.map(adv =>
                             <ListGroup.Item
                               action
                               onClick={() => { console.log(adv); this.setState({ oneAd: adv }) }}
                               key={adv.accomodation_id}
-                              variant={adv.nbVisit > 0 ? "warning" : "success"}
+                              variant={adv.isStillFree ? adv.nbInterested > 0 ? "warning" : "info" : "success"}
                             >
-                              <h5>{adv.Title} : {adv.priceRent + adv.priceCharges} €</h5>
+                              <h5>{adv.Title}</h5>
                               <Row>
                                 <Col>
-                                  <div>visites : {adv.nbVisit}</div>
+                                  <div>Nb d'intéressé : {adv.nbInterested}</div>
                                   <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>
-                                    <Badge variant={adv.isStillFree === 1 ? 'primary' : 'danger'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge>
+                                    <Badge variant={adv.isStillFree === 1 ? 'primary' : 'success'}>{adv.isStillFree === 1 ? 'Libre' : 'Loué'}</Badge>
                                   </div>
                                 </Col>
                               </Row>
