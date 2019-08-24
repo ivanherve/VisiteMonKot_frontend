@@ -74,8 +74,10 @@ export default class LikesList extends Component {
                                                     key={this.state.accomodations.indexOf(acc)}
                                                     action
                                                     onClick={() => this.setState({ targetAcc: acc })}
+                                                    variant={acc.isStillFree ? 'success' : 'danger'}
                                                 >
                                                     <h5>{acc.Title}</h5>
+                                                    <Badge>{acc.isStillFree ? 'Disponible' : 'Loué'}</Badge>
                                                 </ListGroup.Item>
                                             )
                                         }
@@ -91,13 +93,13 @@ export default class LikesList extends Component {
                                             <h5>{acc.priceRent} € de loyer + {acc.priceCharges} € de charges</h5>
                                             <hr />
                                             <h5>Visité</h5>
-                                            <div>{moment(acc.visitDate).fromNow()}</div>
+                                            <div>{moment(acc.visitDate).add(2, 'weeks') <= moment() ? moment(acc.visitDate).format('dddd Do MMMM YYYY à H:mm') : moment(acc.visitDate).fromNow()}</div>
                                             <br />
                                             <h5>Annonceur</h5>
                                             <div>{acc.owner}</div>
                                             <br />
                                             <h5>Nombre de visite : <Badge variant="warning">{acc.nbVisit}</Badge></h5>
-                                            <h5>Nombre d'interessé : <Badge variant="warning">{acc.nbInterested}</Badge></h5>
+                                            <h5>Nombre d'intéressé : <Badge variant="warning">{acc.nbInterested}</Badge></h5>
                                             <br />
                                             <h5>Mis à disposition</h5>
                                             <Row>
