@@ -100,7 +100,7 @@ class Header extends Component {
                                 //<FontAwesomeIcon icon={["fas", "cog"]} style={styles.links} />+
                                 // {Paramètres}
                                 >
-                                    <NavDropdown.Item><Link to={'/profile/reset/' + user.user_id}>Modifier mon mot de passe</Link></NavDropdown.Item>
+                                    <NavDropdown.Item><Link to={'/profile/resetpwd/' + user.user_id}>Modifier mon mot de passe</Link></NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item><Link to="/contact">Contacter l'équipe VisiteMonKot</Link></NavDropdown.Item>
                                 </NavDropdown>
