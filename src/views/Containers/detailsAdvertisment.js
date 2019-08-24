@@ -122,8 +122,9 @@ export default class DetailsAdvertisment extends Component {
                     <ListGroup.Item>Prix des charges :      <Badge variant="info" style={{ fontSize: '1.25rem' }}>{adv.priceCharges} €</Badge></ListGroup.Item>
                     <ListGroup.Item>Prix du loyer :         <Badge variant="info" style={{ fontSize: '1.25rem' }}>{adv.priceRent} €</Badge></ListGroup.Item>
                     <ListGroup.Item>Date de publication :   {moment(adv.PublicationDate).add(2, 'hours').format('LL')} </ListGroup.Item>
-                    <ListGroup.Item>Status :                <Badge variant={adv.isStillFree === 1 ? "warning" : "success"} style={{ fontSize: '1.25rem' }}>{adv.isStillFree === 1 ? "Libre" : "Loué"}</Badge></ListGroup.Item>
+                    <ListGroup.Item>Situation :                <Badge variant={adv.isStillFree === 1 ? "warning" : "success"} style={{ fontSize: '1.25rem' }}>{adv.isStillFree === 1 ? "Libre" : "Loué"}</Badge></ListGroup.Item>
                     <ListGroup.Item>Visité <Badge variant={adv.nbVisit > 0 ? "success" : "warning"} style={{ fontSize: '1rem' }}>{adv.nbVisit}</Badge> fois</ListGroup.Item>
+                    <ListGroup.Item>Nombre d'intéressé : <Badge variant={adv.nbInterested > 0 ? "success" : "warning"} style={{ fontSize: '1rem' }}>{adv.nbInterested}</Badge></ListGroup.Item>
                     <ListGroup.Item>Adresse : {`${adv.address}, ${adv.cityName}`}</ListGroup.Item>
                 </ListGroup>
                 <EditAccomodation
