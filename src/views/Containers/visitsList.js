@@ -124,7 +124,7 @@ export default class VisitsList extends Component {
         this.setState({
             filtred: this.state.accomodations.filter(acc => {
                 return acc.visitDate > moment().format("YYYY-MM-DD H:mm");
-            }), 
+            }),
             //targetAcc: this.state.accomodations[0]
         })
     }
@@ -147,7 +147,7 @@ export default class VisitsList extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.filtred !== prevState.filtred) {
-            if(!this.state.targetAcc) this.setState({ targetAcc: this.state.filtred[0] });
+            if (!this.state.targetAcc) this.setState({ targetAcc: this.state.filtred[0] });
         }
     }
 
@@ -183,7 +183,7 @@ export default class VisitsList extends Component {
                                     <div>
                                         <Row>
                                             <Col xs={4}>
-                                                <ListGroup variant='flush'>
+                                                <ListGroup variant='flush' style={{ overflowY: 'auto', height: '600px' }}>
                                                     {
                                                         accs.map(acc =>
                                                             <ListGroup.Item
@@ -193,10 +193,23 @@ export default class VisitsList extends Component {
                                                                     this.getDatesVisit(acc.accomodation_id)
                                                                 }}
                                                                 action
-                                                                variant={acc.isStillFree === 0 ? "danger" : acc.nbVisit > 2 ? "warning" : "success"}
+                                                                variant={acc.isStillFree === 0 ? "danger" : !acc.approved ? "warning" : "success"}
                                                             >
                                                                 <h5>{acc.Title}</h5>
                                                                 <i>{moment(acc.visitDate).format('LLLL')}</i>
+                                                                <p>
+                                                                    {
+                                                                        acc.isStillFree === 0
+                                                                            ?
+                                                                            <Badge variant='danger'>Loué</Badge>
+                                                                            :
+                                                                            acc.approved
+                                                                                ?
+                                                                                <Badge variant='success'>Accepté</Badge>
+                                                                                :
+                                                                                <Badge variant='warning'>Pas encore confirmé</Badge>
+                                                                    }
+                                                                </p>
                                                             </ListGroup.Item>
                                                         )
                                                     }
@@ -232,7 +245,7 @@ export default class VisitsList extends Component {
                                                                                 <Tooltip>Annuler Visite</Tooltip>
                                                                             }
                                                                         >
-                                                                            <Button style={{ width: '100%' }} variant='outline-danger' onClick={() => this.setState({ showCancel: true })}><FontAwesomeIcon icon={["fas", "times"]} /></Button>
+                                                                            <Button style={{ width: '100%' }} disabled={acc.visitDate < moment().format('YYYY-MM-Do H:mm:ss')} variant='outline-danger' onClick={() => this.setState({ showCancel: true })}><FontAwesomeIcon icon={["fas", "times"]} /></Button>
                                                                         </OverlayTrigger>
                                                                     </Col>
                                                                 </Row>
