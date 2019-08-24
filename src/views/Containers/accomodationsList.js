@@ -250,7 +250,7 @@ export default class AccomodationsList extends Component {
                           <div key={SortedFromNewest.indexOf(accomo)}>
                             <AccItem
                               accomo={accomo}
-                              variant={accomo.isStillFree === 0 ? "danger" : accomo.nbVisit < 1 ? "success" : "warning"}
+                              variant={accomo.isStillFree === 0 ? "danger" : accomo.nbInterested < 1 ? "success" : "warning"}
                               showToVisit={() => { this.setState({ showToVisit: true, targetAcc: accomo }); this.fetchVisitDate(accomo.accomodation_id); console.log(accomo) }}
                               disabled={accomo.isStillFree === 0}
                               cardStyle={styles.zoom}
@@ -299,7 +299,7 @@ class AccItem extends Component {
   }
 
   componentDidMount() {
-    //console.log(this.props.accomo)
+    console.log(this.props.accomo)
   }
 
   render() {
@@ -352,8 +352,17 @@ class AccItem extends Component {
             </Card>
             <br />
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Badge pill variant={variant} style={{ width: variant === 'success' ? '70%' : '40%' }}>
-                <h5>{variant === 'warning' ? 'Visité' : variant === 'danger' ? 'Loué' : 'Pas encore visité'}</h5>
+              <Badge pill variant={variant} style={{ width: variant === 'success' || variant === 'danger' ? '50%' : '90%' }}>
+                {
+                  variant === 'warning' ?
+                  <div>
+                    <h5>Disponible</h5>
+                    <div>Susceptible d'être loué</div>
+                  </div>
+                  :
+                  <h5>{variant === 'danger' ? 'Loué' : 'Disponible'}</h5>
+                }
+                
               </Badge>
             </div>
           </Col>
@@ -408,9 +417,9 @@ class AccItem extends Component {
             </Row>
 
             <Row>
-              <Col xs={2}>{accomo.nbVisit} visites</Col>
+              <Col xs={2}>{accomo.nbVisit ? accomo.nbVisit : 0} visites</Col>
               <Col xs='2'>{accomo.nbInterested ? accomo.nbInterested : 0} Intéressé</Col>
-              <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom} chambres</Col>
+              <Col xs={3}><FontAwesomeIcon icon={["fas", "bed"]} /> {accomo.nbRoom > 1 ? `${accomo.nbRoom} chambres` : `${accomo.nbRoom} chambre`} </Col>
               {
                 accomo.HasWifi === 1
                   ?
