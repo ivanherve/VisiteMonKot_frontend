@@ -26,6 +26,7 @@ export default class EditAccomodation extends Component {
             streets: [],
             addNumb: null,
             boxNumb: null,
+            addVisible: null,
         }
     }
 
@@ -38,7 +39,8 @@ export default class EditAccomodation extends Component {
             description: this.props.adv.description,
             priceCharges: this.props.adv.priceCharges,
             priceRent: this.props.adv.priceRent,
-            cityName: this.props.adv.cityName
+            cityName: this.props.adv.cityName,
+            addVisible: this.props.adv.addressVisible,
         });
         //this.setState({ streetName: this.props.adv.address.split(',')[1] });
         console.log(this.props.adv)
@@ -58,6 +60,7 @@ export default class EditAccomodation extends Component {
                 streetName: this.props.adv.address.split(',')[1],
                 addNumb: this.props.adv.address.split(',')[0].split('/')[0],
                 boxNumb: this.props.adv.address.split(',')[0].split('/')[1],
+                addVisible: this.props.adv.addressVisible,
             });
             console.log([this.state, this.props.adv])
         }
@@ -123,6 +126,7 @@ export default class EditAccomodation extends Component {
         data.append('description', this.state.description);
         data.append('cityName', this.state.cityName);
         data.append('address', this.state.boxNumb ? `${this.state.addNumb}/${this.state.boxNumb},${this.state.streetName}` : `${this.state.addNumb},${this.state.streetName}`);
+        data.append('addressVisible', this.state.addVisible);
         fetch(apiUrl + 'updateaccomodation', {
             method: 'post',
             headers: {
@@ -284,6 +288,30 @@ export default class EditAccomodation extends Component {
                             </Col>
                             <Col>
                                 <Form.Control type='number' placeholder={adv.boxNumb ? adv.boxNumb : 'boîte'} min='0' onChange={e => this.setState({ boxNumb: e.target.value })} />
+                            </Col>
+                        </Form.Group>
+                        
+                        <Form.Group as={Row} controlId="formPlaintextEmail">
+                            <Form.Label column sm="2">
+                                Adresse visible
+                            </Form.Label>
+                            <Col sm="10">
+                                <Form.Check
+                                    custom
+                                    inline
+                                    checked={this.state.addVisible}
+                                    type="checkbox"
+                                    id="custom-checkbox5"
+                                    label=""
+                                    onChange={e => {/**/
+                                        if (!this.state.addVisible) {
+                                            this.setState({ addVisible: 1 });
+                                        } else {
+                                            this.setState({ addVisible: 0 });
+                                        }
+                                        console.log(this.state.addVisible)
+                                    }}
+                                />
                             </Col>
                         </Form.Group>
 
