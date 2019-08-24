@@ -6,14 +6,15 @@ import 'react-dates/lib/css/_datepicker.css';
 
 import { DateRangePicker, SingleDatePicker } from 'react-dates';
 import { apiUrl, API_URL_CP, API_URL_RUE } from '../../router';
-import Axios from 'axios';
 import moment from 'moment';
 import CitiesList from '../Containers/CitiesList';
 import StreetList from '../Containers/StreetList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import swal from 'sweetalert';
-
+import deepai from 'deepai';
 import FileBase64 from 'react-file-base64';
+
+deepai.setApiKey('e1f1ce45-ca41-4f8b-877b-a7e25ccaf6f0');
 
 export default class AddAnnounce extends Component {
     constructor(props) {
@@ -50,6 +51,7 @@ export default class AddAnnounce extends Component {
             datesVisitsToSend: [],
             startTimeVisits: null,
             endTimeVisits: null,
+            msg: 'Veuillez importer des photos de moins d\'1Mo',
         };
     }
 
@@ -128,32 +130,65 @@ export default class AddAnnounce extends Component {
         });
         console.log(e.target.value)
     }
-/*
-    sendImages = (files) => {
-        files.map(file => {
-            //b64.push(file.base64)
-            let data = new FormData();
-            data.append('image', file.base64);
-            data.append('aid', 1)
-            fetch(`${apiUrl}uploadimages`, {
-                method: 'post',
-                headers: {
-                    'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
-                },
-                body: data
-            }).then(response => response.json())
-                .then(res => {
-                    if (res.status === 'error') console.log(res.response);
-                    else console.log(res);
-                })
+    /*
+        sendImages = (files) => {
+            files.map(file => {
+                //b64.push(file.base64)
+                let data = new FormData();
+                data.append('image', file.base64);
+                data.append('aid', 1)
+                fetch(`${apiUrl}uploadimages`, {
+                    method: 'post',
+                    headers: {
+                        'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token,
+                    },
+                    body: data
+                }).then(response => response.json())
+                    .then(res => {
+                        if (res.status === 'error') console.log(res.response);
+                        else console.log(res);
+                    })
+            })
+        }
+    */
+
+    handlePictures = pictures => {
+        if (pictures !== this.state.pictures) {
+            this.setState({ msg: 'Chargement' });
+        } else {
+            this.setState({ msg: null })
+        }
+        pictures.map(pic => {
+            console.log(this.state.pictures);
+            deepai.callStandardApi("nsfw-detector", {
+                image: pic.base64,
+            }).then(res => {
+                console.log(this.state.pictures);
+                if (res.output.detections.length < 1) {
+                    if (this.state.pictures.length < 1) this.setState({ pictures: [pic] });
+                    else this.setState({ pictures: [...this.state.pictures, pic] });
+                } else {
+                    swal({
+                        icon: 'warning',
+                        text: pic.name + ' est une image inapproprié! Elle ne sera pas importé'
+                    })
+                }
+            }).catch(err => {
+                swal({
+                    icon: 'warning',
+                    text: pic.name + ' est trop volumineux! Veillez à importer des photos de moins 1Mo!'
+                });
+                console.log('Photo voluminieux ou ' + err)
+            });
         })
     }
-*/
+
+
     addOneAnnounce = () => {
         let imgb64 = [];
         this.state.pictures.map(pic => {
             imgb64.push(pic.base64)
-        });        
+        });
         let data = new FormData();
         data.append('title', this.state.title);
         data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
@@ -173,7 +208,7 @@ export default class AddAnnounce extends Component {
         data.append('addressVisible', this.state.addressVisible);
         data.append('typeDate', this.state.typeDate.toString());
         //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
-        data.append('image', JSON.stringify(imgb64));        
+        data.append('image', JSON.stringify(imgb64));
         fetch(apiUrl + 'addadvertisments', {
             method: 'post',
             headers: {
@@ -507,7 +542,7 @@ export default class AddAnnounce extends Component {
                                 <FileBase64
                                     className='form-control-file'
                                     multiple={true}
-                                    onDone={pictures => this.setState({ pictures })}
+                                    onDone={pictures => this.handlePictures(pictures)}
                                 />
                                 <Row>
                                     {
@@ -518,12 +553,17 @@ export default class AddAnnounce extends Component {
                                                     <div style={styles.thumb}>
                                                         <div style={styles.thumbInner}>
                                                             <Image src={img.base64} style={styles.img} />
+                                                            <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
+                                                                {this.state.msg}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )
                                             :
-                                            null
+                                            <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
+                                                {this.state.msg}
+                                            </div>
                                     }
                                 </Row>
                             </Card.Body>
