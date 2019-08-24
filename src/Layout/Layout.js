@@ -45,8 +45,9 @@ class Layout extends Component {
                 {
                   JSON.parse(sessionStorage.getItem('userData')).user.profil_id === 1
                     ?
-                    <Alert variant='warning'>                      
-                      <FontAwesomeIcon icon={["fas",'exclamation-triangle']} /> Veuillez vous reconnectez dès que vous activez votre compte
+                    <Alert variant='warning' style={{fontSize:'0.9rem'}}>                      
+                      <FontAwesomeIcon icon={["fas",'exclamation-triangle']} /> Votre inscription est bientôt finalisé ! Un mail de confirmation a été envoyé l’adresse suivante <strong><i>{JSON.parse(sessionStorage.getItem('userData')).user.email}</i></strong>, veuillez y suivre les instructions indiquées dans le mail pour activer votre compte.<br/>
+                      Veuillez par la suite vous reconnecter si vous rester sur cette page.
                     </Alert>
                     :
                     null
