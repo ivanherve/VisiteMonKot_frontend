@@ -17,7 +17,7 @@ export default class ProfileDetails extends Component {
             Surname: '',
             call_code: null,
             mobile: '',
-            codes: []
+            countries: []
         }
     }
 
@@ -26,30 +26,32 @@ export default class ProfileDetails extends Component {
     }
 
     getCallCodes = () => {
+        let countries = [];
         fetch(`${API_URL_TEL}`)
             .then(res => res.json())
-            .then(res => {
-                //console.log(res)
-                res.map(el => {
-                    if (this.state.codes.length > 0) {
-                        this.setState({ codes: [...this.state.codes, { country: el.translations.fr ? el.translations.fr : el.name, code: el.callingCodes[0] }] })
+            .then(data => {
+                data.map(d => {
+                    if (d.callingCodes[0] !== '32') {
+                        countries.push({
+                            name: d.translations.fr ? d.translations.fr : d.name,
+                            code: d.callingCodes[0]
+                        })
                     } else {
-                        this.setState({
-                            codes: [
-                                {
-                                    country: el.translations.fr ? el.translations.fr : el.name,
-                                    code: el.callingCodes[0]
-                                }
-                            ]
+                        countries.unshift({
+                            name: d.translations.fr ? d.translations.fr : d.name,
+                            code: d.callingCodes[0]
                         })
                     }
                 })
+                this.setState({ countries });
+                this.setState({ call_code: countries[5].code })
             })
     }
 
 
 
     editInformations = () => {
+        console.log(this.state.mobile)
         if (this.state.email === "") {
             this.setState({ email: this.props.user.email })
         }
@@ -118,10 +120,10 @@ export default class ProfileDetails extends Component {
         return (
             <div>
                 <Row>
-                    <Col xs='9'>
-                        <h2>{user.Firstname} {user.Surname}</h2>
+                    <Col xs='8'>
+                        <h2>Informations</h2>
                     </Col>
-                    <Col xs='3'>
+                    <Col xs='4'>
                         {
                             this.state.toEdit
                                 ?
@@ -133,13 +135,26 @@ export default class ProfileDetails extends Component {
                                     Modifier <FontAwesomeIcon icon={["fas", "edit"]} />
                                 </Button>
                                 :
-                                <Button
-                                    style={{ width: '100%' }}
-                                    variant='outline-success'
-                                    onClick={() => this.editInformations()}
-                                >
-                                    Confirmer <FontAwesomeIcon icon={["fas", "check"]} />
-                                </Button>
+                                <Row>
+                                    <Col xs='9'>
+                                        <Button
+                                            style={{ width: '100%' }}
+                                            variant='outline-success'
+                                            onClick={() => this.editInformations()}
+                                        >
+                                            Confirmer <FontAwesomeIcon icon={["fas", "check"]} />
+                                        </Button>
+                                    </Col>
+                                    <Col xs='3'>
+                                        <Button
+                                            style={{ width: '100%' }}
+                                            variant='outline-secondary'
+                                            onClick={() => this.setState({ toEdit: true })}
+                                        >
+                                            <FontAwesomeIcon icon={["fas", "times"]} />
+                                        </Button>
+                                    </Col>
+                                </Row>
                         }
                     </Col>
                 </Row>
@@ -181,13 +196,12 @@ export default class ProfileDetails extends Component {
                                     :
                                     <Row>
                                         <Col xs='4'>
-                                            <Form.Control as='select' defaultValue={`+${user.call_code}`} onChange={e => this.handleMobile(e)}>
+                                            <Form.Control as='select' onChange={e => this.handleMobile(e)}>
                                                 {
-                                                    this.state.codes.map(c =>
-                                                        <option key={this.state.codes.indexOf(c)}>+ {c.code} - {c.country}</option>
+                                                    this.state.countries.map(c =>
+                                                        <option key={this.state.countries.indexOf(c)}>+ {c.code} - {c.name}</option>
                                                     )
                                                 }
-                                                <option>{`+${user.call_code}`}</option>
                                             </Form.Control>
                                         </Col>
                                         <Col xs='8'>
