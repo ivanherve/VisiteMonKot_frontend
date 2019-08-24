@@ -24,10 +24,7 @@ export default class RentAccomodation extends Component {
         })
         .then(response => response.json())
         .then(res => {
-            if(res.status === 'error'){
-                swal(res.response[0]);
-                console.log(res.response)
-            } else {                
+            if(res.status === 'success'){
                 swal({
                     text: 'Ce logement est loué',
                     icon: 'success',
@@ -39,6 +36,9 @@ export default class RentAccomodation extends Component {
                     this.props.onHide();
                     window.location.reload();
                 });
+            } else {
+                swal(res.response[0]);
+                console.log(res.response)
             }
         })
     }
@@ -54,7 +54,9 @@ export default class RentAccomodation extends Component {
                     <Modal.Title>Louer un logement</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Êtes-vous sûr de le louer ?
+                Nous vous recommandons de le louer que si un contrat de location a bien été signé. Cela vous éviterait d'annuler des visiter. 
+                <hr />
+                Êtes-vous sûr de le louer ?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={() => this.rentAccomodation()}>

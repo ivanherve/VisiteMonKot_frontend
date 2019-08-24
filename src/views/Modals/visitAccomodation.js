@@ -45,7 +45,7 @@ export default class VisitAccomodation extends Component {
                     console.log(res.response)
                 } else {
                     swal({
-                        text: `Votre demande de visite a bien été envoyée pour le \n ${moment(res.response).format('Do dd MM YYYY à H:mm')}`,
+                        text: `Votre demande de visite a bien été envoyée pour le \n ${moment(res.response).format('dddd Do MMMM YYYY à H:mm')}`,
                         icon: 'success',
                         button: {
                             closeModal: false,

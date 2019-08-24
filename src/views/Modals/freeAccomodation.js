@@ -4,7 +4,7 @@ import { apiUrl } from '../../router';
 import swal from 'sweetalert';
 
 export default class FreeAccomodation extends Component {
-    constructor(){
+    constructor() {
         super();
         this.state = {
             status: 1,
@@ -15,25 +15,29 @@ export default class FreeAccomodation extends Component {
         let data = new FormData();
         data.append('status', this.state.status);
         data.append('accId', this.props.accId)
-        fetch(apiUrl+'freeaccomodation',{
+        fetch(apiUrl + 'freeaccomodation', {
             method: 'post',
-            headers:{
+            headers: {
                 'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
             },
             body: data
         })
-        .then(response => response.json())
-        .then(res => {
-            if(res.status === 'error'){
-                swal(res.response[0]);
-                console.log(res.response)
-            } else {
-                swal('Ce logement est libéré');
-                this.setState({status: 0});
-                this.props.onHide();
-                window.location.reload();
-            }
-        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'error') {
+                    swal(res.response[0]);
+                    console.log(res.response)
+                } else {
+                    swal({
+                        icon: 'warning',
+                        text: 'Ce logement est libéré'
+                    }).then(() => {
+                        this.setState({ status: 0 });
+                        this.props.onHide();
+                        window.location.reload();
+                    });
+                }
+            })
     }
 
     render() {

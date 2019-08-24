@@ -60,7 +60,7 @@ class Login extends Component {
     data.append('email', this.state.email);
     swal({
       title: 'Mot de passe perdu',
-      text: 'En poursuivant, vous recevrez un mail avec un nouveau mot de passe généré aléatoirement que vous deverez changer lors de votre première utilisation. \n\n Êtes-vous sûr de vouloir poursuivre ?',
+      text: 'En poursuivant, vous recevrez un mail avec un nouveau mot de passe généré aléatoirement que vous devrez changer lors de votre première utilisation. \n\n Êtes-vous sûr de vouloir poursuivre ?',
       icon: 'warning',
       dangerMode: true,
       buttons: ["Annuler", "Poursuivre"]
