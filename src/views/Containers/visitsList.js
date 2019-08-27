@@ -40,6 +40,10 @@ export default class VisitsList extends Component {
                     this.setState({ dateVisitAcc: Object.values(res.response) })
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     getVisits = () => {
@@ -61,6 +65,10 @@ export default class VisitsList extends Component {
                     this.getDatesVisit(res.response[0].accomodation_id)
                     console.log(res.response)
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -90,6 +98,10 @@ export default class VisitsList extends Component {
                     })
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     notInterested = (aid) => {
@@ -117,6 +129,10 @@ export default class VisitsList extends Component {
                         text: res.response[0]
                     })
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -261,14 +277,30 @@ export default class VisitsList extends Component {
                                                                             <FontAwesomeIcon icon={["fas", "thumbs-down"]} /> Pas Intéressé
                                                                         </Button>
                                                                         :
-                                                                        <Button
-                                                                            style={{ width: '100%' }}
-                                                                            variant='outline-success'
-                                                                            onClick={() => this.interested(acc.accomodation_id)}
-                                                                            disabled={acc.visitDate > moment().format("YYYY-MM-DD H:mm")}
-                                                                        >
-                                                                            <FontAwesomeIcon icon={["fas", "thumbs-up"]} /> Intéressé
-                                                                        </Button>
+                                                                        <OverlayTrigger overlay={
+                                                                            acc.approved
+                                                                                ?
+                                                                                acc.visitDate > moment().format("YYYY-MM-DD H:mm")
+                                                                                    ?
+                                                                                    <Tooltip id="tooltip-disabled">
+                                                                                        <div>Attendez que la visite aie lieu</div>
+                                                                                    </Tooltip>
+                                                                                    :
+                                                                                    <div></div>
+                                                                                :
+                                                                                <Tooltip id="tooltip-disabled">Cette visite n'a pas encore été confirmé</Tooltip>
+                                                                        }>
+                                                                            <span className="d-inline-block">
+                                                                                <Button
+                                                                                    style={{ width: '100%', pointerEvents: acc.visitDate > moment().format("YYYY-MM-DD H:mm") || !acc.approved ? 'none' : null }}
+                                                                                    variant='outline-success'
+                                                                                    onClick={() => this.interested(acc.accomodation_id)}
+                                                                                    disabled={acc.visitDate > moment().format("YYYY-MM-DD H:mm") || !acc.approved}
+                                                                                >
+                                                                                    <FontAwesomeIcon icon={["fas", "thumbs-up"]} /> Intéressé
+                                                                                </Button>
+                                                                            </span>
+                                                                        </OverlayTrigger>
                                                                 }
                                                             </Col>
                                                         </Row>
