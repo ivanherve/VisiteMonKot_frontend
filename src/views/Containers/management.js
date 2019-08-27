@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Container, Col, ListGroup, Card, Row, Form, DropdownButton, Dropdown, Button, FormControl } from 'react-bootstrap';
+import { Container, Col, ListGroup, Card, Row, Form, DropdownButton, Dropdown, Button } from 'react-bootstrap';
 import { apiUrl } from '../../router';
-import swal from 'sweetalert';
+import swal from '@sweetalert/with-react';
 import moment from 'moment';
 import StickyBox from "react-sticky-box";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -45,6 +45,10 @@ export default class Management extends Component {
                     this.getProfiles();
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     getProfiles = () => {
@@ -64,6 +68,10 @@ export default class Management extends Component {
                     //console.log(res.response[0]);
                     this.setState({ profiles: res.response });
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -108,6 +116,7 @@ export class Utilisateurs extends Component {
             showMsg: false,
             showEdit: false,
             showAuthorize: false,
+            password: '',
         }
     }
 
@@ -175,6 +184,49 @@ export class Utilisateurs extends Component {
         return style;
     }
 
+    removeaccess = (uid) => {
+        swal({
+            text: "Veuillez d'abord entrer votre mot de passe",
+            content: (
+                <Form.Control type='password' onChange={e => this.setState({ password: e.target.value })} />
+            ),
+            button: 'Continuer'
+        })
+            .then(() => {
+                let data = new FormData();
+                data.append('uid', uid);
+                data.append('password', this.state.password);
+                fetch(`${apiUrl}removeuser`, {
+                    method: 'post',
+                    headers: {
+                        'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                    },
+                    body: data
+                }).then(response => response.json())
+                    .then(res => {
+                        if (res.status === 'error') {
+                            swal({
+                                text: res.response[0],
+                                icon: 'warning'
+                            })
+                        } else {
+                            console.log(res.response);
+                            swal({
+                                text: res.response,
+                                icon: 'success',
+                            }).then(() => {
+                                window.location.reload();
+                            })
+                        }
+                    })
+                    .catch(err => {
+                        swal("Oups!", "Une erreur est survenue", "error");
+                        console.log(err)
+                    })
+            })
+
+    }
+
     render() {
         let user = this.state.targetUser ? this.state.targetUser : this.props.user;
         let users = this.props.allUsers.sort((a, b) => (a.names > b.names) ? 1 : (b.names > a.names) ? -1 : 0);
@@ -193,7 +245,7 @@ export class Utilisateurs extends Component {
                         <Col>
                             <Form as={Row}>
                                 <Col xs='10'>
-                                    <FormControl
+                                    <Form.Control
                                         type="text"
                                         placeholder='Rechercher ...'
                                         className="mr-sm-2"
@@ -256,7 +308,7 @@ export class Utilisateurs extends Component {
                                                 <Button
                                                     style={{ width: '100%' }}
                                                     disabled={user.profil_id === 3}
-                                                    onClick={() => this.setState({ showRemove: true })}
+                                                    onClick={() => this.removeaccess(user.user_id)}
                                                     variant={user.profil_id === 3 ? 'light' : 'outline-danger'}>
                                                     Retirer ses accès <FontAwesomeIcon icon={["fas", "times"]} />
                                                 </Button>
@@ -282,46 +334,52 @@ export class Utilisateurs extends Component {
                                 </Row>
                                 <hr />
                                 <Form.Group as={Row}>
+                                    <Form.Label sm='3' column style={styles.label}>Identifiant</Form.Label>
+                                    <Col sm='9'>
+                                        <Form.Control plaintext readOnly defaultValue={user.user_id} />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Adresse e-mail</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control plaintext readOnly value={user.email} />
+                                        <Form.Control plaintext readOnly defaultValue={user.email} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Profile</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control style={this.setStyle(user.profil_id)} plaintext readOnly value={user.profilName} />
+                                        <Form.Control style={this.setStyle(user.profil_id)} plaintext readOnly defaultValue={user.profilName} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Nombre de connection</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control plaintext readOnly value={user.nbToken ? user.nbToken : 0} />
+                                        <Form.Control plaintext readOnly defaultValue={user.nbToken ? user.nbToken : 0} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Etat</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control style={user.nbTokenActifs > 0 ? styles.online : styles.notonline} plaintext readOnly value={user.nbTokenActifs ? user.nbTokenActifs > 0 ?  `En ligne` : 'Hors ligne' : 'Hors ligne'} />
+                                        <Form.Control style={user.nbTokenActifs > 0 ? styles.online : styles.notonline} plaintext readOnly defaultValue={user.nbTokenActifs ? user.nbTokenActifs > 0 ? `En ligne` : 'Hors ligne' : 'Hors ligne'} />
                                     </Col>
                                 </Form.Group>
                                 <hr />
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Date d'inscription</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control plaintext readOnly value={moment(user.create_time).format('LL')} />
+                                        <Form.Control plaintext readOnly defaultValue={moment(user.create_time).format('LL')} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Nombre de visites</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control plaintext readOnly value={user.nbVisites} />
+                                        <Form.Control plaintext readOnly defaultValue={user.nbVisites} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row}>
                                     <Form.Label sm='3' column style={styles.label}>Nombre d'anonnces</Form.Label>
                                     <Col sm='9'>
-                                        <Form.Control plaintext readOnly value={user.nbAnnonces} />
+                                        <Form.Control plaintext readOnly defaultValue={user.nbAnnonces} />
                                     </Col>
                                 </Form.Group>
                             </Card.Body>
