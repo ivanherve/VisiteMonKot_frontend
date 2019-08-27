@@ -62,8 +62,8 @@ export default class AccomodationsList extends Component {
         }
       })
       .catch(err => {
-          swal("Oups!", "Une erreur est survenue", "error");
-          console.log(err)
+        swal("Oups!", "Une erreur est survenue", "error");
+        console.log(err)
       })
   }
 
@@ -72,26 +72,31 @@ export default class AccomodationsList extends Component {
     fetch(apiUrl + 'accomodations/' + qty)
       .then(response => response.json())
       .then(res => {
-        if (res.status === 'error') {
-          swal(res.response[0]);
-          console.log(res.response[1]);
-        } else {
-          if (res.response.length === qty) {
-            this.setState({ accomodations: res.response, hasMoreAccomo: true });
-            //console.log([res.response.length, qty])
-          } else this.setState({ hasMoreAccomo: false });
-          res.response.map(el =>
-            arr.push(el.priceCharges + el.priceRent)
-          );
-          this.setState({ priceMax: Math.max(...arr) });
-          //console.log(Math.max(...arr));
-          this.setState({ max: Math.max(...arr) });
+        if (res) {
+          if (res.status === 'error') {
+            swal(res.response[0]);
+            console.log(res.response[1]);
+          } else {
+            if (res.response.length === qty) {
+              this.setState({ accomodations: res.response, hasMoreAccomo: true });
+              //console.log([res.response.length, qty])
+            } else this.setState({ hasMoreAccomo: false });
+            res.response.map(el =>
+              arr.push(el.priceCharges + el.priceRent)
+            );
+            this.setState({ priceMax: Math.max(...arr) });
+            //console.log(Math.max(...arr));
+            this.setState({ max: Math.max(...arr) });
 
+          }
+        } else {
+          this.setState({ loading: 1 })
         }
+
       })
       .catch(err => {
-          swal("Oups!", "Une erreur est survenue", "error");
-          console.log(err)
+        swal("Oups!", "Une erreur est survenue", "error");
+        console.log(err)
       })
   }
 
@@ -112,8 +117,8 @@ export default class AccomodationsList extends Component {
         }
       })
       .catch(err => {
-          swal("Oups!", "Une erreur est survenue", "error");
-          console.log(err)
+        swal("Oups!", "Une erreur est survenue", "error");
+        console.log(err)
       })
   }
 
@@ -209,7 +214,7 @@ export default class AccomodationsList extends Component {
     ) : this.state.isSortedFromMostExpensive ? items.sort(
       (a, b) => ((a.priceRent + a.priceCharges) < (b.priceRent + b.priceCharges)) ? 1 : (((b.priceRent + b.priceCharges) < (a.priceRent + a.priceCharges)) ? -1 : 0)
     ) : items;
-    setTimeout(() => this.setState({ loading: 1 }), 5000);
+    setTimeout(() => this.setState({ loading: 1 }), 7000);
     //if (!this.state.loading) return <div style={{ display: 'flex', justifyContent: 'center' }}></div>
     return (
       <Row>
@@ -367,14 +372,14 @@ class AccItem extends Component {
               <Badge pill variant={variant} style={{ width: variant === 'success' || variant === 'danger' ? '50%' : '90%' }}>
                 {
                   variant === 'warning' ?
-                  <div>
-                    <h5>Disponible</h5>
-                    <div>Susceptible d'être loué</div>
-                  </div>
-                  :
-                  <h5>{variant === 'danger' ? 'Loué' : 'Disponible'}</h5>
+                    <div>
+                      <h5>Disponible</h5>
+                      <div>Susceptible d'être loué</div>
+                    </div>
+                    :
+                    <h5>{variant === 'danger' ? 'Loué' : 'Disponible'}</h5>
                 }
-                
+
               </Badge>
             </div>
           </Col>
