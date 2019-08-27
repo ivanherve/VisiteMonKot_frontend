@@ -43,6 +43,10 @@ export default class MyAdvertisments extends Component {
     })
       .then(response => response.json())
       .then(res => {
+        if(!res){
+          this.setState({ loading: 1 })
+        }
+        
         if (res.status === 'success') {
           this.setState({ advertisments: res.response });
           this.setState({ isThereAccomo: true });
@@ -70,7 +74,7 @@ export default class MyAdvertisments extends Component {
 
   render() {
     let profil = JSON.parse(sessionStorage.getItem('userData')).user.profil_id;
-    setTimeout(() => this.setState({ loading: 1 }), 5000);
+    setTimeout(() => this.setState({ loading: 1 }), 7000);
     return (
       <Container>
         <h1>Annonces</h1>
