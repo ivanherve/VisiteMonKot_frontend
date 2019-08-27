@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Row, Col, Button } from 'react-bootstrap';
+import { Modal, Form, Row, Col, Button, Image, Card, Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import moment from 'moment';
 import { apiUrl, API_URL_CP, API_URL_RUE } from '../../router';
 import swal from 'sweetalert';
@@ -7,6 +7,9 @@ import CitiesList from '../Containers/CitiesList';
 import Axios from 'axios';
 import StreetList from '../Containers/StreetList';
 import $ from 'jquery';
+import FileBase64 from 'react-file-base64';
+import deepai from 'deepai';
+import trashImg from '../../logo/delete-sign.png';
 
 export default class EditAccomodation extends Component {
     constructor(props) {
@@ -27,7 +30,16 @@ export default class EditAccomodation extends Component {
             addNumb: null,
             boxNumb: null,
             addVisible: null,
+            nbRoom: null,
+            beginTime: null,
+            endTime: null,
+            surface: null,
+            pictures: [],
+            msg: 'Veuillez importer des images de moins d\'1Mo',
+            delete: false,
+            focusImg: null,
         }
+
     }
 
     componentDidMount() {
@@ -40,14 +52,22 @@ export default class EditAccomodation extends Component {
             priceCharges: this.props.adv.priceCharges,
             priceRent: this.props.adv.priceRent,
             cityName: this.props.adv.cityName,
+            streetName: this.props.adv.address.split(',')[1],
+            addNumb: this.props.adv.address.split(',')[0].split('/')[0],
+            boxNumb: this.props.adv.address.split(',')[0].split('/')[1],
             addVisible: this.props.adv.addressVisible,
+            nbRoom: this.props.adv.nbRoom,
+            beginTime: this.props.adv.BeginingTime,
+            endTime: this.props.adv.EndTime,
+            surface: this.props.adv.Surface,
+            pictures: this.props.adv.pictures ? this.props.adv.pictures : [],
         });
         //this.setState({ streetName: this.props.adv.address.split(',')[1] });
         console.log(this.props.adv)
     }
 
-    componentDidUpdate(nextProps) {
-        if (this.props.adv.accomodation_id !== nextProps.adv.accomodation_id) {
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.adv !== prevProps.adv) {
             this.setState({
                 title: this.props.adv.Title,
                 hasWifi: this.props.adv.hasWifi,
@@ -61,10 +81,16 @@ export default class EditAccomodation extends Component {
                 addNumb: this.props.adv.address.split(',')[0].split('/')[0],
                 boxNumb: this.props.adv.address.split(',')[0].split('/')[1],
                 addVisible: this.props.adv.addressVisible,
+                nbRoom: this.props.adv.nbRoom,
+                beginTime: this.props.adv.BeginingTime,
+                endTime: this.props.adv.EndTime,
+                surface: this.props.adv.Surface,
+                pictures: this.props.adv.pictures ? this.props.adv.pictures : [],
             });
             console.log([this.state, this.props.adv])
         }
     }
+
 
     getCities = () => {
         Axios.get(`${API_URL_CP}/${this.state.query}`)
@@ -73,6 +99,10 @@ export default class EditAccomodation extends Component {
                     cities: data.data.localites ? data.data.localites : [{ id: 0, nom: 'personne' }]
                 });
                 console.log(data.data.localites)
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -83,6 +113,10 @@ export default class EditAccomodation extends Component {
                     streets: data.data.rues ? data.data.rues : [{ id: 0, nom: 'personne' }]
                 });
                 console.log(data.data.rues)
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -114,12 +148,61 @@ export default class EditAccomodation extends Component {
         console.log(e.target.value)
     }
 
+    handlePictures = pictures => {
+        if (pictures !== this.state.pictures) {
+            this.setState({ msg: 'Chargement' });
+        } else {
+            this.setState({ msg: null })
+        }
+        pictures.map(pic => {
+            console.log(this.state.pictures);
+            deepai.callStandardApi("nsfw-detector", {
+                image: pic.base64,
+            }).then(res => {
+                console.log(this.state.pictures);
+                if (res.output.detections.length < 1) {
+                    if (this.state.pictures.length < 1) {
+                        this.setState({
+                            pictures: [{
+                                picture: pic.base64,
+                            }]
+                        });
+                    }
+                    else this.setState({
+                        pictures: [...this.state.pictures, {
+                            picture: pic.base64,
+                        }]
+                    });
+                } else {
+                    swal({
+                        icon: 'warning',
+                        text: pic.name + ' est une image inapproprié! Elle ne sera pas importé'
+                    })
+                }
+            }).catch(err => {
+                swal({
+                    icon: 'warning',
+                    text: pic.name + ' est trop volumineux! Veillez à importer des photos de moins 1Mo!'
+                });
+                console.log('Photo voluminieux ou ' + err)
+            });
+        })
+    }
+
     updateAccomodation = () => {
+        let imgb64 = [];
+        this.state.pictures.map(pic => {
+            imgb64.push(pic.picture)
+        });
         let data = new FormData();
         data.append('accId', this.props.adv.accomodation_id);
         data.append('title', this.state.title);
+        data.append('nbRoom', this.state.nbRoom);
+        data.append('surface', this.state.surface);
         data.append('rent', this.state.priceRent);
         data.append('charge', this.state.priceCharges);
+        data.append('beginTime', this.state.beginTime);
+        data.append('endTime', this.state.endTime);
         data.append('hasWifi', this.state.hasWifi);
         data.append('hasFurniture', this.state.hasFurnitures);
         data.append('hasParking', this.state.hasCarPark);
@@ -127,6 +210,7 @@ export default class EditAccomodation extends Component {
         data.append('cityName', this.state.cityName);
         data.append('address', this.state.boxNumb ? `${this.state.addNumb}/${this.state.boxNumb},${this.state.streetName}` : `${this.state.addNumb},${this.state.streetName}`);
         data.append('addressVisible', this.state.addVisible);
+        data.append('image', JSON.stringify(imgb64));
         fetch(apiUrl + 'updateaccomodation', {
             method: 'post',
             headers: {
@@ -151,6 +235,10 @@ export default class EditAccomodation extends Component {
                         window.location.reload();
                     });
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -187,6 +275,24 @@ export default class EditAccomodation extends Component {
 
                         <Form.Group as={Row}>
                             <Form.Label column sm="2">
+                                Nombre de chambre
+                            </Form.Label>
+                            <Col sm="10">
+                                <Form.Control type='number' placeholder={adv.nbRoom} onChange={e => this.setState({ nbRoom: e.target.value })} />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
+                                Surface
+                            </Form.Label>
+                            <Col sm="10">
+                                <Form.Control type='number' placeholder={adv.surface} onChange={e => this.setState({ surface: e.target.value })} />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
                                 Prix du Loyer
                                 </Form.Label>
                             <Col sm="10">
@@ -200,6 +306,18 @@ export default class EditAccomodation extends Component {
                             </Form.Label>
                             <Col sm="10">
                                 <Form.Control type="number" min={0} placeholder={adv.priceCharges + " €"} onChange={e => this.setState({ priceCharges: e.target.value })} />
+                            </Col>
+                        </Form.Group>
+
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
+                                Dates de location
+                            </Form.Label>
+                            <Col sm="5">
+                                <Form.Control type="date" defaultValue={adv.beginTime} min={moment().format('YYYY-MM-Do')} onChange={e => this.setState({ beginTime: e.target.value })} />
+                            </Col>
+                            <Col sm="5">
+                                <Form.Control type="date" defaultValue={adv.endTime} min={this.state.beginTime} onChange={e => this.setState({ endTime: e.target.value })} />
                             </Col>
                         </Form.Group>
 
@@ -290,10 +408,10 @@ export default class EditAccomodation extends Component {
                                 <Form.Control type='number' placeholder={adv.boxNumb ? adv.boxNumb : 'boîte'} min='0' onChange={e => this.setState({ boxNumb: e.target.value })} />
                             </Col>
                         </Form.Group>
-                        
+
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                             <Form.Label column sm="2">
-                                Adresse visible
+
                             </Form.Label>
                             <Col sm="10">
                                 <Form.Check
@@ -302,7 +420,7 @@ export default class EditAccomodation extends Component {
                                     checked={this.state.addVisible}
                                     type="checkbox"
                                     id="custom-checkbox5"
-                                    label=""
+                                    label="Adresse visible"
                                     onChange={e => {/**/
                                         if (!this.state.addVisible) {
                                             this.setState({ addVisible: 1 });
@@ -324,6 +442,68 @@ export default class EditAccomodation extends Component {
                             </Col>
                         </Form.Group>
 
+                        <Form.Group as={Row}>
+                            <Form.Label column sm="2">
+                                Photos
+                            </Form.Label>
+                            <Col sm="10">
+                                <Card>
+                                    <Card.Body>
+                                        <FileBase64
+                                            className='form-control-file'
+                                            multiple={true}
+                                            onDone={pictures => this.handlePictures(pictures)}
+                                        />
+                                        <Row>
+                                            {
+                                                this.state.pictures.length > 0
+                                                    ?
+                                                    this.state.pictures.map(img =>
+                                                        <OverlayTrigger key={this.state.pictures.indexOf(img)} overlay={<Tooltip>Supprimer</Tooltip>}>
+                                                            <div style={styles.thumbsContainer}>
+                                                                <div style={styles.thumb}>
+                                                                    <div style={styles.thumbInner}>
+                                                                        <div
+                                                                            style={this.state.focusImg === this.state.pictures.indexOf(img) ? styles.imgHovered : styles.img}
+                                                                            onMouseOver={() => this.setState({ focusImg: this.state.pictures.indexOf(img) })}
+                                                                            onMouseOut={() => this.setState({ focusImg: null })}
+                                                                        >
+                                                                            <Image
+                                                                                src={img.picture}
+                                                                                onClick={() => {
+                                                                                    var pics = [...this.state.pictures];
+                                                                                    var idx = pics.indexOf(img);
+                                                                                    if (idx !== -1) {
+                                                                                        pics.splice(idx, 1);
+                                                                                        this.setState({ pictures: pics })
+                                                                                    } else {
+                                                                                        console.log(pics)
+                                                                                    }
+                                                                                }}
+                                                                                onMouseOver={() => this.setState({ focusImg: this.state.pictures.indexOf(img) })}
+                                                                                onMouseOut={() => this.setState({ focusImg: null })}
+                                                                                style={this.state.focusImg === this.state.pictures.indexOf(img) ? styles.imgHovered : styles.img}
+                                                                            />
+                                                                        </div>
+                                                                        <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
+                                                                            {this.state.msg}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </OverlayTrigger>
+                                                    )
+                                                    :
+                                                    <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
+                                                        {this.state.msg}
+                                                    </div>
+                                            }
+                                        </Row>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Form.Group>
+
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                             <Form.Label column sm="2">
                                 Mis à jour le
@@ -336,13 +516,13 @@ export default class EditAccomodation extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="success" onClick={() => {
-                        if($("#alert").text() === '') {
+                        if ($("#alert").text() === '') {
                             this.updateAccomodation();
                         }
                         else swal({
                             text: 'Il y a des guillemets dans le titre, veuillez les retirer svp',
                             icon: 'warning'
-                        })                        
+                        })
                     }}
                     >
                         Modifier
@@ -351,4 +531,50 @@ export default class EditAccomodation extends Component {
             </Modal>
         )
     }
+}
+
+const styles = {
+    thumbsContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 16
+    },
+    thumb: {
+        display: 'inline-flex',
+        borderRadius: 2,
+        border: '1px solid #eaeaea',
+        marginBottom: 8,
+        marginRight: 8,
+        width: 100,
+        height: 100,
+        padding: 4,
+        boxSizing: 'border-box'
+    },
+    thumbInner: {
+        display: 'flex',
+        minWidth: 0,
+        overflow: 'hidden'
+    },
+    img: {
+        display: 'block',
+        width: 'auto',
+        height: '100%',
+    },
+    imgHovered: {
+        display: 'block',
+        width: 'auto',
+        height: '100%',
+        cursor: 'pointer',
+        opacity: '0.5',
+        backgroundImage: 'url(' + trashImg + ')',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        marginBottom: 8,
+        marginRight: 8,
+        width: 100,
+        height: 100,
+    }
+
 }

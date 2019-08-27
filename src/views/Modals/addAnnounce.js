@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import swal from 'sweetalert';
 import deepai from 'deepai';
 import FileBase64 from 'react-file-base64';
+import trashImg from '../../logo/delete-sign.png';
 
 deepai.setApiKey('e1f1ce45-ca41-4f8b-877b-a7e25ccaf6f0');
 
@@ -52,6 +53,7 @@ export default class AddAnnounce extends Component {
             startTimeVisits: null,
             endTimeVisits: null,
             msg: 'Veuillez importer des photos de moins d\'1Mo',
+            focusImg: null,
         };
     }
 
@@ -183,60 +185,83 @@ export default class AddAnnounce extends Component {
         })
     }
 
-
     addOneAnnounce = () => {
         let imgb64 = [];
         this.state.pictures.map(pic => {
             imgb64.push(pic.base64)
         });
-        let data = new FormData();
-        data.append('title', this.state.title);
-        data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
-        data.append('nbRoom', this.state.nbRoom);
-        data.append('priceRent', this.state.priceRent);
-        data.append('priceCharges', this.state.priceCharges);
-        data.append('BeginingTime', moment(this.state.beginingTime).format().slice(0, 10));
-        data.append('EndTime', moment(this.state.endTime).format().slice(0, 10));
-        data.append('Description', this.state.description);
-        data.append('HasWifi', this.state.hasWifi);
-        data.append('HasCarPark', this.state.hasCarPark);
-        data.append('HasFurnitures', this.state.hasFurnitures);
-        data.append('cityName', this.state.cityName);
-        data.append('Type', this.state.type);
-        data.append('Surface', this.state.surface);
-        data.append('datesVisit', JSON.stringify(this.state.datesVisitsToSend));
-        data.append('addressVisible', this.state.addressVisible);
-        data.append('typeDate', this.state.typeDate.toString());
-        //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
-        data.append('image', JSON.stringify(imgb64));
-        fetch(apiUrl + 'addadvertisments', {
-            method: 'post',
-            headers: {
-                //'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
-            },
-            body: data
-        })
-            .then(response => response.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    swal({
-                        title: 'Parfait!',
-                        text: `Annonce ajoutée`,
-                        icon: 'success',
-                        button: {
-                            closeModal: false,
-                        }
-                    })
-                        .then(() => {
-                            this.props.handleClose();
-                            window.location.reload();
-                        });
-                } else {
-                    swal(res.response[0]);
-                    console.log(res.response)
-                }
-            }, err => { swal(err); console.log(this.state.pictures) })
+        if (this.state.typeDate === 2) {
+            this.setState({
+                datesVisits: [
+                    {
+                        firstDate: this.state.startDate,
+                        lastDate: this.state.startDate,
+                        startTimeVisits: this.state.startTimeVisits,
+                        endTimeVisits: this.state.endTimeVisits, variant: 'info'
+                    }
+                ],
+                datesVisitsToSend: [
+                    {
+                        firstDate: moment(this.state.startDate).format('YYYY-MM-DD'),
+                        lastDate: moment(this.state.startDate).format('YYYY-MM-DD'),
+                        startTimeVisits: this.state.startTimeVisits,
+                        endTimeVisits: this.state.endTimeVisits, variant: 'info'
+                    }
+                ],
+            });
+        }
+        if (this.state.datesVisitsToSend.length > 0) {
+            let data = new FormData();
+            data.append('title', this.state.title);
+            data.append('address', this.state.box === '' ? this.state.number + ', ' + this.state.streetName : this.state.number + '/' + this.state.box + ', ' + this.state.streetName);
+            data.append('nbRoom', this.state.nbRoom);
+            data.append('priceRent', this.state.priceRent);
+            data.append('priceCharges', this.state.priceCharges);
+            data.append('BeginingTime', moment(this.state.beginingTime).format().slice(0, 10));
+            data.append('EndTime', moment(this.state.endTime).format().slice(0, 10));
+            data.append('Description', this.state.description);
+            data.append('HasWifi', this.state.hasWifi);
+            data.append('HasCarPark', this.state.hasCarPark);
+            data.append('HasFurnitures', this.state.hasFurnitures);
+            data.append('cityName', this.state.cityName);
+            data.append('Type', this.state.type);
+            data.append('Surface', this.state.surface);
+            data.append('datesVisit', JSON.stringify(this.state.datesVisitsToSend));
+            data.append('addressVisible', this.state.addressVisible);
+            data.append('typeDate', this.state.typeDate.toString());
+            //data.append('endVisit', moment(this.state.endDate).format().slice(0, 10));
+            data.append('image', JSON.stringify(imgb64));
+            fetch(apiUrl + 'addadvertisments', {
+                method: 'post',
+                headers: {
+                    //'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': JSON.parse(sessionStorage.getItem('userData')).token.api_token
+                },
+                body: data
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        swal({
+                            title: 'Parfait!',
+                            text: `Annonce ajoutée`,
+                            icon: 'success',
+                            button: {
+                                closeModal: false,
+                            }
+                        })
+                            .then(() => {
+                                this.props.handleClose();
+                                window.location.reload();
+                            });
+                    } else {
+                        swal(res.response[0]);
+                        console.log(res.response, [this.state.typeDate, this.state.datesVisitsToSend])
+                    }
+                }, err => { swal(err); console.log(this.state.pictures) }
+                )
+        }
+
     }
 
     componentDidMount() {
@@ -344,10 +369,22 @@ export default class AddAnnounce extends Component {
                                                             if (!this.state.oneDate || !this.state.startTimeVisits || !this.state.endTimeVisits) swal('Insérez une date et des heures svp!')
                                                             else this.setState({
                                                                 datesVisits: [
-                                                                    { firstDate: this.state.oneDate, lastDate: this.state.oneDate, startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisits
+                                                                    {
+                                                                        firstDate: this.state.oneDate,
+                                                                        lastDate: this.state.oneDate,
+                                                                        startTimeVisits: this.state.startTimeVisits,
+                                                                        endTimeVisits: this.state.endTimeVisits, variant: 'info'
+                                                                    },
+                                                                    ...this.state.datesVisits
                                                                 ],
                                                                 datesVisitsToSend: [
-                                                                    { firstDate: moment(this.state.oneDate).format('YYYY-MM-DD'), lastDate: moment(this.state.oneDate).format('YYYY-MM-DD'), startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisitsToSend
+                                                                    {
+                                                                        firstDate: moment(this.state.oneDate).format('YYYY-MM-DD'),
+                                                                        lastDate: moment(this.state.oneDate).format('YYYY-MM-DD'),
+                                                                        startTimeVisits: this.state.startTimeVisits,
+                                                                        endTimeVisits: this.state.endTimeVisits, variant: 'info'
+                                                                    },
+                                                                    ...this.state.datesVisitsToSend
                                                                 ],
                                                             })
                                                         }}>
@@ -368,10 +405,24 @@ export default class AddAnnounce extends Component {
                                                                 else {
                                                                     this.setState({
                                                                         datesVisits: [
-                                                                            { firstDate: this.state.firstDate, lastDate: this.state.lastDate, startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'success' }, ...this.state.datesVisits
+                                                                            {
+                                                                                firstDate: this.state.firstDate,
+                                                                                lastDate: this.state.lastDate,
+                                                                                startTimeVisits: this.state.startTimeVisits,
+                                                                                endTimeVisits: this.state.endTimeVisits,
+                                                                                variant: 'success'
+                                                                            },
+                                                                            ...this.state.datesVisits
                                                                         ],
                                                                         datesVisitsToSend: [
-                                                                            { firstDate: moment(this.state.firstDate).format('YYYY-MM-DD'), lastDate: moment(this.state.lastDate).format('YYYY-MM-DD'), startTimeVisits: this.state.startTimeVisits, endTimeVisits: this.state.endTimeVisits, variant: 'info' }, ...this.state.datesVisitsToSend
+                                                                            {
+                                                                                firstDate: moment(this.state.firstDate).format('YYYY-MM-DD'),
+                                                                                lastDate: moment(this.state.lastDate).format('YYYY-MM-DD'),
+                                                                                startTimeVisits: this.state.startTimeVisits,
+                                                                                endTimeVisits: this.state.endTimeVisits,
+                                                                                variant: 'info'
+                                                                            },
+                                                                            ...this.state.datesVisitsToSend
                                                                         ],
                                                                     })
                                                                 }
@@ -549,16 +600,39 @@ export default class AddAnnounce extends Component {
                                         this.state.pictures.length > 0
                                             ?
                                             this.state.pictures.map(img =>
-                                                <div key={this.state.pictures.indexOf(img)} style={styles.thumbsContainer}>
-                                                    <div style={styles.thumb}>
-                                                        <div style={styles.thumbInner}>
-                                                            <Image src={img.base64} style={styles.img} />
-                                                            <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
-                                                                {this.state.msg}
+                                                <OverlayTrigger key={this.state.pictures.indexOf(img)} overlay={<Tooltip>Supprimer</Tooltip>}>
+                                                    <div style={styles.thumbsContainer}>
+                                                        <div style={styles.thumb}>
+                                                            <div style={styles.thumbInner}>
+                                                                <div
+                                                                    onMouseOver={() => this.setState({ focusImg: this.state.pictures.indexOf(img) })}
+                                                                    onMouseOut={() => this.setState({ focusImg: null })}
+                                                                    style={this.state.focusImg === this.state.pictures.indexOf(img) ? styles.imgHovered : styles.img}
+                                                                >
+                                                                    <Image
+                                                                        src={img.base64}
+                                                                        onClick={() => {
+                                                                            var pics = [...this.state.pictures];
+                                                                            var idx = pics.indexOf(img);
+                                                                            if (idx !== -1) {
+                                                                                pics.splice(idx, 1);
+                                                                                this.setState({ pictures: pics })
+                                                                            } else {
+                                                                                console.log(pics)
+                                                                            }
+                                                                        }}
+                                                                        onMouseOver={() => this.setState({ focusImg: this.state.pictures.indexOf(img) })}
+                                                                        onMouseOut={() => this.setState({ focusImg: null })}
+                                                                        style={this.state.focusImg === this.state.pictures.indexOf(img) ? styles.imgHovered : styles.img}
+                                                                    />
+                                                                </div>
+                                                                <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
+                                                                    {this.state.msg}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </OverlayTrigger>
                                             )
                                             :
                                             <div style={{ color: '#ddd', display: 'flex', justifyContent: 'center' }}>
@@ -615,5 +689,20 @@ const styles = {
         display: 'block',
         width: 'auto',
         height: '100%'
+    },
+    imgHovered: {
+        display: 'block',
+        width: 'auto',
+        height: '100%',
+        cursor: 'pointer',
+        opacity: '0.5',
+        backgroundImage: 'url(' + trashImg + ')',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        marginBottom: 8,
+        marginRight: 8,
+        width: 90,
+        height: 90,
     }
 }
