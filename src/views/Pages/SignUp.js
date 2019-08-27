@@ -42,6 +42,10 @@ export default class SignUp extends Component {
                     console.log(res.response)
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     signUp = () => {
@@ -70,6 +74,10 @@ export default class SignUp extends Component {
                             swal({ text: res.response[0] });
                             console.log(res.response)
                         }
+                    })
+                    .catch(err => {
+                        swal("Oups!", "Une erreur est survenue", "error");
+                        console.log(err)
                     })
             }
         } else {
@@ -100,6 +108,10 @@ export default class SignUp extends Component {
                 })
                 this.setState({ countries });
                 this.setState({ callingCode: countries[5].code })
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 

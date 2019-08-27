@@ -46,6 +46,10 @@ export default class ProfileDetails extends Component {
                 this.setState({ countries });
                 this.setState({ call_code: countries[5].code })
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
 
@@ -105,7 +109,15 @@ export default class ProfileDetails extends Component {
                         })
                     }
                 })
+                .catch(err => {
+                    swal("Oups!", "Une erreur est survenue", "error");
+                    console.log(err)
+                })
 
+        })
+        .catch(err => {
+            swal("Oups!", "Une erreur est survenue", "error");
+            console.log(err)
         })
     }
 

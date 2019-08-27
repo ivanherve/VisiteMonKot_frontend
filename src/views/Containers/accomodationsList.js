@@ -61,6 +61,10 @@ export default class AccomodationsList extends Component {
           this.setState({ types: res.response })
         }
       })
+      .catch(err => {
+          swal("Oups!", "Une erreur est survenue", "error");
+          console.log(err)
+      })
   }
 
   fetchAccomodations = (qty = 10) => {
@@ -85,6 +89,10 @@ export default class AccomodationsList extends Component {
 
         }
       })
+      .catch(err => {
+          swal("Oups!", "Une erreur est survenue", "error");
+          console.log(err)
+      })
   }
 
   fetchVisitDate = (id) => {
@@ -102,6 +110,10 @@ export default class AccomodationsList extends Component {
         } else {
           this.setState({ datesVisit: Object.values(res.response) });
         }
+      })
+      .catch(err => {
+          swal("Oups!", "Une erreur est survenue", "error");
+          console.log(err)
       })
   }
 

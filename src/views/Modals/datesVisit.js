@@ -70,6 +70,10 @@ export default class DatesVisit extends Component {
                         });
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     updateDatesVisit = (strd, endd, strt, endt, id) => {
@@ -106,6 +110,10 @@ export default class DatesVisit extends Component {
                             window.location.reload();
                         });
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 

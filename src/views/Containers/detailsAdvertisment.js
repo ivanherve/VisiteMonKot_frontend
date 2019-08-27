@@ -42,6 +42,10 @@ export default class DetailsAdvertisment extends Component {
                     this.setState({ visitors: res.response })
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     fetchVisitDate = (id) => {
@@ -59,6 +63,10 @@ export default class DetailsAdvertisment extends Component {
                 } else {
                     this.setState({ datesVisit: Object.values(res.response) });
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 

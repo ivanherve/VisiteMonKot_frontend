@@ -36,6 +36,10 @@ export default class VisitorsList extends Component {
                     })
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     refuseVisit = (visiter_id, aid) => {
@@ -76,7 +80,15 @@ export default class VisitorsList extends Component {
                                 })
                             }
                         })
+                        .catch(err => {
+                            swal("Oups!", "Une erreur est survenue", "error");
+                            console.log(err)
+                        })
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
 
     }

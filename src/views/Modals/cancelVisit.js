@@ -38,6 +38,10 @@ export default class CancelVisit extends Component {
                         });
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     render() {

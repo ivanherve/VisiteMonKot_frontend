@@ -34,6 +34,10 @@ class Header extends Component {
                 console.log(res.response);
                 //}
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     componentWillMount() {

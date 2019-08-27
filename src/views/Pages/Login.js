@@ -53,6 +53,10 @@ class Login extends Component {
           console.log(res.response)
         }
       })
+      .catch(err => {
+          swal("Oups!", "Une erreur est survenue", "error");
+          console.log(err)
+      })
   }
 
   pwdLost = () => {
@@ -84,6 +88,10 @@ class Login extends Component {
                   icon: 'success'
                 })
               }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
         }
       })

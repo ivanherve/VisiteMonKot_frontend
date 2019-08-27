@@ -32,6 +32,10 @@ export default class SignOutAUser extends Component {
                     })
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     render() {

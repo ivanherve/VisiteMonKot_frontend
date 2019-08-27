@@ -62,6 +62,10 @@ export default class AdminEditInfo extends Component {
                     }
                 })
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     handleMobile = e => {
@@ -107,6 +111,10 @@ export default class AdminEditInfo extends Component {
                     });
                     console.log({ state: this.state, props: this.props.user })
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
 
     }

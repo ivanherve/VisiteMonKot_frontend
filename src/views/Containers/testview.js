@@ -6,6 +6,7 @@ import logo from "../../logo/vmk_v3_1.png";
 import logoname from "../../logo/vmk_nom.png";
 
 import FileBase64 from 'react-file-base64';
+import swal from 'sweetalert';
 
 deepai.setApiKey('e1f1ce45-ca41-4f8b-877b-a7e25ccaf6f0');
 
@@ -41,6 +42,10 @@ export default class Test extends Component {
                 if (res.status === 'error') console.log(res.response);
                 else console.log(res);
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     getImg = () => {
@@ -56,6 +61,10 @@ export default class Test extends Component {
                     this.setState({ imagesgot: res.response })
                     console.log(res)
                 };
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
@@ -100,6 +109,10 @@ export default class Test extends Component {
                     alert('error');
                     console.log('error')
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 

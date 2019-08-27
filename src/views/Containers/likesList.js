@@ -35,6 +35,10 @@ export default class LikesList extends Component {
                     this.setState({ accomodations: res.response, targetAcc: res.response[0] });
                     console.log(res.response[0])
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             });
     }
 

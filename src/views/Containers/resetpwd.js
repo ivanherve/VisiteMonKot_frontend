@@ -46,7 +46,10 @@ export default class ResetPwd extends Component {
                         });
                 }
             })
-            .catch(e => console.log(e))
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     handleOldPwd(o) {

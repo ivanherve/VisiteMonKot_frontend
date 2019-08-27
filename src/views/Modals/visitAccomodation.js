@@ -58,6 +58,10 @@ export default class VisitAccomodation extends Component {
 
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     render() {
@@ -79,7 +83,7 @@ export default class VisitAccomodation extends Component {
                             datesVisit.length === 1 && !datesVisit[0].end_date ?
                                 <Form>
                                     <Form.Label>
-                                        <i>A partir du: {moment(datesVisit[0].start_date).format('LL')}</i>
+                                        <i>A partir du: {moment(datesVisit[0].start_date).format('LL')} entre {moment(datesVisit[0].start_time).format('H:m')} et {moment(datesVisit[0].end_time).format('H:m')}</i> 
                                     </Form.Label>
                                     <Row>
                                         <Col xs='9'>

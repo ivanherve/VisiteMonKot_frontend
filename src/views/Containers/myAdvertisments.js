@@ -7,6 +7,7 @@ import { apiUrl } from '../../router';
 import AddAnnounce from '../Modals/addAnnounce';
 import DetailsAdvertisment from './detailsAdvertisment';
 import LoadingComponent from './LoadingComponent';
+import swal from 'sweetalert';
 
 export default class MyAdvertisments extends Component {
   constructor(props, context) {
@@ -19,7 +20,7 @@ export default class MyAdvertisments extends Component {
       showModal: false,
       advertisments: [],
       accomodation_id: '',
-      oneAd: {},
+      oneAd: null,
       loading: null,
       //datesVisit: []
     };
@@ -52,6 +53,11 @@ export default class MyAdvertisments extends Component {
           console.log(res.response)
         }
       })
+      .catch(err => {
+          swal("Oups!", "Une erreur est survenue", "error");
+          console.log(err);
+          window.location.reload();
+      })
   }
 
   showAd = (ad) => {
@@ -60,7 +66,7 @@ export default class MyAdvertisments extends Component {
 
   componentDidMount() {
     this.getAdvertisment();
-  }
+  }  
 
   render() {
     let profil = JSON.parse(sessionStorage.getItem('userData')).user.profil_id;
@@ -121,10 +127,7 @@ export default class MyAdvertisments extends Component {
                       </ListGroup>
                     </Col>
                     <Col>
-                      <DetailsAdvertisment
-                        advertisment={this.state.oneAd}
-                      //datesVisit={this.state.datesVisit}
-                      />
+                      <DetailsAdvertisment advertisment={this.state.oneAd} />
                     </Col>
                   </Row>
 
@@ -132,7 +135,7 @@ export default class MyAdvertisments extends Component {
                   <div style={styles.image}>
                     <div style={styles.emptyList}>
                       Vous n'avez annoncé aucun logement
-              </div>
+                    </div>
                   </div>
               }
             </div>

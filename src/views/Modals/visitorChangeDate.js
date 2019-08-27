@@ -70,6 +70,10 @@ export default class VisitorChangeDate extends Component {
                         });
                 }
             })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
+            })
     }
 
     displayCard = (id, length) => {

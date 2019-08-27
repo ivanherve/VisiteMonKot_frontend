@@ -29,7 +29,7 @@ export default class FreeAccomodation extends Component {
                     console.log(res.response)
                 } else {
                     swal({
-                        icon: 'warning',
+                        icon: 'success',
                         text: 'Ce logement est libéré'
                     }).then(() => {
                         this.setState({ status: 0 });
@@ -37,6 +37,10 @@ export default class FreeAccomodation extends Component {
                         window.location.reload();
                     });
                 }
+            })
+            .catch(err => {
+                swal("Oups!", "Une erreur est survenue", "error");
+                console.log(err)
             })
     }
 
