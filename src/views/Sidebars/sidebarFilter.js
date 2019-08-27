@@ -5,7 +5,7 @@ export default class SideBarFilter extends Component {
     render() {
         return (
             <nav className="sidebar-wrapper">
-                <div className="sidebar-content" style={{ maxWidth: '210px', overflow: 'auto' }}>
+                <div className="sidebar-content" style={{ maxWidth: '210px', overflow: 'auto', display: window.innerWidth <= 1500 ? 'none' : null}}>
                     <Card>
                         <article className="card-group-item">
                             <Card.Header>
